@@ -353,10 +353,10 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
     html = html.replaceAll('{{BODY}}', body);
 
     final message = Message()
-      ..from = Address(_userName, utils.user.nombres)
+      ..from = Address(_userName, utils.user.name)
       ..recipients.add(_contacto)
       ..subject =
-          '${utils.user.nombres.toUpperCase()} [${_adulto.nombres} ${_adulto.apellidos}] - $now'
+          '${utils.user.name.toUpperCase()} [${_adulto.nombres} ${_adulto.apellidos}] - $now'
       ..html = html;
     try {
       final sendReport = await send(message, smtpServer);

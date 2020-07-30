@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
-import 'package:cogniplus_mobile/src/model/user_model.dart';
 import 'package:cogniplus_mobile/src/providers/db_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -22,11 +21,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  UserModel user;
+  
 
   @override
   Widget build(BuildContext context) {
-    user = utils.user;
+    
 
     return Scaffold(
       appBar: AppBar(
@@ -56,10 +55,10 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: SafeArea(
-        child: (utils.user.nombres == 'admin')
+        child: (utils.user.name == 'admin')
             ? _showDialog(context)
             : FutureBuilder<List<AdultoModel>>(
-                future: DBProvider.db.getAllAdultos(user.id),
+                future: DBProvider.db.getAllAdultos(utils.user.id),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData)
                     return Center(child: Text('Sin datos.'));
@@ -188,17 +187,13 @@ class _HomePageState extends State<HomePage> {
                         color: Colors.white,
                         textColor: Colors.grey,
                         onPressed: () async {
-
-
                           /*await SimplePermissions.requestPermission(
                               Permission.WriteExternalStorage);
                           bool checkPermission =
                               await SimplePermissions.checkPermission(
                                   Permission.WriteExternalStorage);*/
                           final permission = EasyPermissionValidator(
-                            context: context,
-                            appName: 'Cogniplus_mobile'
-                          );
+                              context: context, appName: 'Cogniplus_mobile');
 
                           final checkPermission = await permission.storage();
 

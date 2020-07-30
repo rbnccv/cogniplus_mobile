@@ -30,9 +30,9 @@ class DBProvider {
         onCreate: (db, version) async {
       await db.execute('CREATE TABLE USERS ('
           ' id INTEGER PRIMARY KEY AUTOINCREMENT, '
-          ' rut TEXT, '
-          ' nombres TEXT,'
-          ' pass TEXT)');
+          ' name TEXT, '
+          ' email TEXT,'
+          ' password TEXT)');
 
       await db.execute('CREATE TABLE USERS_ADULTOS ('
           ' id INTEGER PRIMARY KEY AUTOINCREMENT, '
@@ -71,7 +71,7 @@ class DBProvider {
           ' evaluacion TEXT, '
           ' visualizaciones INTEGER, '
           ' enviado INTEGER DEFAULT 0)');
-
+/*
       await db.insert(
           'USERS',
           UserModel(id: 1, rut: '111111111', nombres: 'admin', pass: 'admin')
@@ -87,7 +87,7 @@ class DBProvider {
       await db.insert(
           'USERS',
           UserModel(id: 4, rut: '444444444', nombres: 'casa3', pass: 'casa3')
-              .toJson());
+              .toJson());*/
 /*
       await db.insert('USERS_ADULTOS', {'id': 1, 'id_user': 2, 'id_adulto': 1});
       await db.insert('USERS_ADULTOS', {'id': 2, 'id_user': 2, 'id_adulto': 2});
@@ -358,7 +358,7 @@ class DBProvider {
     List<AdultoModel> list =
         res.map((adulto) => AdultoModel.fromJson(adulto)).toList();
 
-    return (res.isNotEmpty) ? list : [].toList();
+    return (res.isNotEmpty) ? list : <AdultoModel>[].toList();
   }
 
 /* TABLA USUARIO */
@@ -373,22 +373,16 @@ class DBProvider {
   Future<bool> verifyUserPass(String name, String pass) async {
     final db = await database;
     final res = await db.rawQuery(
-        'SELECT * FROM USERS WHERE (nombres = "$name") AND (pass="$pass") LIMIT 1');
+        'SELECT * FROM USERS WHERE (name = "$name") AND (password="$pass") LIMIT 1');
 
     return res.isEmpty ? false : true;
   }
 
-  dynamic getUserByRut(String rut) async {
-    final db = await database;
-    final res = await db.query('USERS', where: 'rut = ?', whereArgs: [rut]);
-
-    return (res.isNotEmpty) ? UserModel.fromJson(res.first) : null;
-  }
 
   dynamic getUserByName(String name) async {
     final db = await database;
     final res =
-        await db.query('USERS', where: 'nombres = ?', whereArgs: [name]);
+        await db.query('USERS', where: 'name = ?', whereArgs: [name]);
 
     return (res.isNotEmpty) ? UserModel.fromJson(res.first) : null;
   }

@@ -57,7 +57,7 @@ showToast(BuildContext context, String msg) {
       msg: msg,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
+      timeInSecForIosWeb: 3,
       backgroundColor: Theme.of(context).accentColor,
       textColor: Colors.white,
       fontSize: 16.0);

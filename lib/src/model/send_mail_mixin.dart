@@ -31,10 +31,10 @@ class EmailManager {
     String now = DateFormat("yyyy/MM/dd").format(DateTime.now());
 
     final message = Message()
-      ..from = Address(_username, utils.user.nombres)
+      ..from = Address(_username, utils.user.name)
       ..recipients.add(_contacto)
       ..subject =
-          '${utils.user.nombres.toUpperCase()} [${adulto.nombres} ${adulto.apellidos}] - $now'
+          '${utils.user.name.toUpperCase()} [${adulto.nombres} ${adulto.apellidos}] - $now'
       ..html = html;
 
     try {
