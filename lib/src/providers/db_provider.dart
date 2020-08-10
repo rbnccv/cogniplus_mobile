@@ -370,19 +370,25 @@ class DBProvider {
     return res;
   }
 
-  Future<bool> verifyUserPass(String name, String pass) async {
+  Future<bool> verifyUserPass({String email, String password}) async {
     final db = await database;
     final res = await db.rawQuery(
-        'SELECT * FROM USERS WHERE (name = "$name") AND (password="$pass") LIMIT 1');
+        'SELECT * FROM USERS WHERE (email = "$email") AND (password="$password") LIMIT 1');
 
     return res.isEmpty ? false : true;
   }
 
-
   dynamic getUserByName(String name) async {
     final db = await database;
+    final res = await db.query('USERS', where: 'name = ?', whereArgs: [name]);
+
+    return (res.isNotEmpty) ? UserModel.fromJson(res.first) : null;
+  }
+
+  dynamic getUserBy({String field, String value}) async {
+    final db = await database;
     final res =
-        await db.query('USERS', where: 'name = ?', whereArgs: [name]);
+        await db.query('USERS', where: '$field = ?', whereArgs: [value]);
 
     return (res.isNotEmpty) ? UserModel.fromJson(res.first) : null;
   }

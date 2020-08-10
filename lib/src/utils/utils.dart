@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:cogniplus_mobile/src/model/user_model.dart';
+import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
@@ -39,8 +42,8 @@ final estBodyAccent19 = TextStyle(
   color: accent,
 );
 
-final estBodyAccent12 = TextStyle(
-  fontSize: 12.0,
+final estBodyAccent14 = TextStyle(
+  fontSize: 14.0,
   color: accent,
   fontWeight: FontWeight.normal,
   fontFamily: 'Quicksand',
@@ -87,10 +90,38 @@ void showSnack(String title, String message, BuildContext context) {
   )..show(context);
 }
 
-logoff(BuildContext context) {
+logoff(BuildContext context) async {
   user = null;
+
+  var response = await Api().getDataFromApi(url: '/logout');
+  var body = json.decode(response.body);
+
+  showToast(context, body['message']);
+
   Navigator.of(context)
       .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
+}
+
+onBackPressed(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: (context) => new AlertDialog(
+      title: new Text('Seguro?'),
+      content: new Text('Deseas salir de la aplicación.'),
+      actions: <Widget>[
+        new GestureDetector(
+          onTap: () => Navigator.of(context).pop(false),
+          child: Text("NO"),
+        ),
+        SizedBox(height: 16),
+        new GestureDetector(
+          onTap: () => Navigator.of(context).pop(true),
+          child: Text("YES"),
+        ),
+      ],
+    ),
+  ) ??
+      false;
 }
 
 UserModel user;
@@ -124,7 +155,7 @@ final List<String> listFilesModulo3 = [
   "$folder/modulo3/4pulgaresopuestos.mp4",
   "$folder/modulo3/5tijerasycirculos.mp4",
   "$folder/modulo3/3.mp4"
-];//revisar
+]; //revisar
 
 final List<String> listFilesModulo4 = [
   "$folder/modulo4/1gateocruzado.mp4",
@@ -133,7 +164,7 @@ final List<String> listFilesModulo4 = [
   "$folder/modulo4/4pulgaresopuestoscomplejos.mp4",
   "$folder/modulo4/4.mp4"
   //"$folder/modulo4/desafios.mp4",
-];//revisar
+]; //revisar
 
 final modulos = [m1, m2, m3, m4];
 Map m1 = {

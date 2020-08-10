@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
+import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:cogniplus_mobile/src/providers/db_provider.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -38,7 +41,8 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
       _ingresos,
       _rut,
       _fono,
-      _info;
+      _info,
+      _email;
 
   TextEditingController _nombreTextController = new TextEditingController();
   TextEditingController _apellidoTextController = new TextEditingController();
@@ -63,6 +67,7 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
     _fechaNacimiento = DateFormat('dd-MM-yyyy').format(DateTime.now());
     _ingresos = '';
     _rut = '';
+    _email = '';
     _fonoTextController.text = '(56) 9';
     _info = '';
   }
@@ -82,26 +87,30 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xffE6E6E6),
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            IconButton(
-                icon: Icon(FontAwesomeIcons.question, color: Colors.white),
-                onPressed: () {}),
-            Text(
-              'Añadir perfil',
-              style: utils.estTitulo,
-            ),
-            IconButton(
-                icon: Icon(FontAwesomeIcons.powerOff, color: Colors.white),
-                onPressed: () {}),
-          ],
-        ),
-      ),
+      appBar: _appbar(context),
       body: SafeArea(
         child: SingleChildScrollView(child: _getForm(context)),
+      ),
+    );
+  }
+
+  _appbar(BuildContext context) {
+    return AppBar(
+      automaticallyImplyLeading: false,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          IconButton(
+              icon: Icon(FontAwesomeIcons.question, color: Colors.white),
+              onPressed: () {}),
+          Text(
+            'Añadir perfil',
+            style: utils.estTitulo,
+          ),
+          IconButton(
+              icon: Icon(FontAwesomeIcons.powerOff, color: Colors.white),
+              onPressed: () {}),
+        ],
       ),
     );
   }
@@ -331,7 +340,7 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
                                   controller: _infoTextController,
                                   onSaved: (value) =>
                                       setState(() => _info = value),
-                                  keyboardType: TextInputType.text,
+                                  keyboardType: TextInputType.multiline,
                                   minLines: 4,
                                   maxLines: 6,
                                   maxLengthEnforced: true,
@@ -358,14 +367,14 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
                     SizedBox(
                         width: (width / 2) + 60,
                         height: 50.0,
-                        child: _recordButton())
+                        child: _recordButton(context))
                   ],
                 ),
               ],
             )));
   }
 
-  Widget _recordButton() {
+  Widget _recordButton(BuildContext context) {
     return FlatButton(
       color: Theme.of(context).primaryColor,
       child: Text('REGISTRAR',
@@ -380,6 +389,20 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
   _registrarAnciano(BuildContext context) async {
     if (!_formKey.currentState.validate()) return null;
     _formKey.currentState.save();
+
+    var connectivity = await Connectivity().checkConnectivity();
+
+    if (connectivity == ConnectivityResult.none) {
+      await _storeInDatabase(context);
+    } else {
+      await _storeInNetwork(context);
+    }
+    //Navigator.of(context).pop();
+    Navigator.of(context).pushReplacementNamed('home');
+  }
+
+  _storeInDatabase(BuildContext context) async {
+    utils.showToast(context, 'Fuera de linea');
 
     AdultoModel adulto = new AdultoModel(
         nombres: _nombre,
@@ -415,9 +438,35 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
       utils.showToast(context, 'Error al registrar a:  ${adulto.nombres}');
       return null;
     }
-
     utils.showToast(context, msg);
-    Navigator.of(context).pop();
+  }
+
+  _storeInNetwork(BuildContext context) async {
+    utils.showToast(context, 'En linea.');
+
+    DateTime tmp = DateFormat('dd-MM-yyyy').parse(_fechaNacimiento);
+
+    Map<String, dynamic> senior = {
+      "user_id": utils.user.id,
+      "rut": _rut,
+      "names": _nombre,
+      "last_names": _apellidos,
+      "gender": (_sexo == 'F') ? 0 : 1,
+      "course": _escolaridad,
+      "phone": _fono,
+      "email": _email,
+      "birthday": DateFormat('yyyy-MM-dd').format(tmp),
+      "revenue": _ingresos,
+      "info": _fono
+    };
+
+    var response =
+        await Api().setPostDataFromApi(url: '/seniors', data: senior);
+
+    var body = json.decode(response.body);
+
+    //utils.showToast(_formKey.currentContext, body.toString());
+    print("DEBUG:" + body.toString());
   }
 
   Widget _makeRadioButton(double width, BuildContext context) {

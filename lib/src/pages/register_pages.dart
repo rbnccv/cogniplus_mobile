@@ -1,40 +1,30 @@
 import 'dart:convert';
 
-import 'package:cogniplus_mobile/src/model/user_model.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:cogniplus_mobile/src/providers/db_provider.dart';
 import 'package:cogniplus_mobile/src/widgets/input_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:connectivity/connectivity.dart';
 
-//Text('headline', style: Theme.of(context).textTheme.headline,),
-
-class LoginPage extends StatefulWidget {
-  static final _formKey = GlobalKey<FormState>();
+class RegisterPage extends StatefulWidget {
+  static final _registerFormKey = GlobalKey<FormState>();
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
+  String _name;
   String _email;
   String _password;
-  bool _rememberMe = false;
+  String _passwordConfirmation;
   bool _isLoading = false;
-
-  final Widget figure =
-      new SvgPicture.asset('assets/svg/figura.svg', color: Colors.grey);
 
   @override
   void initState() {
     super.initState();
-    if (utils.user != null) {
-      Navigator.of(context).pushReplacementNamed('home');
-    }
   }
 
   @override
@@ -53,14 +43,13 @@ class _LoginPageState extends State<LoginPage> {
       Align(
           alignment: Alignment(-0.9, -0.9),
           child: Column(children: <Widget>[
-            Text('¿No tienes Cuenta?', style: utils.estBodyAccent14),
             FlatButton(
                 color: utils.accent,
                 child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 7, horizontal: 2),
-                    child: Text('REGISTRATE', style: utils.estBodyWhite18)),
+                    child: Text('VOLVER', style: utils.estBodyWhite18)),
                 onPressed: () {
-                  Navigator.of(context).pushNamed('register');
+                  Navigator.of(context).pop();
                 })
           ])),
       Align(
@@ -108,13 +97,13 @@ class _LoginPageState extends State<LoginPage> {
                     child: Image.asset(
                       'assets/images/logo.png',
                       width: 240.0,
-                      height: 120.0,
+                      height: 80.0,
                     )),
                 Positioned(
-                    top: 170,
+                    top: 100,
                     left: 5,
                     child: Container(
-                      width: 260, height: 400,
+                      width: 260, height: 450,
                       //color: Colors.green,
                       child: _getWidgetLoginForm(),
                     ))
@@ -124,13 +113,25 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _getWidgetLoginForm() {
     return Form(
-      key: LoginPage._formKey,
+      key: RegisterPage._registerFormKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           InputText(
+              hint: "Nombre",
+              onSaved: (value) => _name = value.trim(),
+              inputType: TextInputType.text,
+              fontSize: 20,
+              prefixIcon: Icons.face,
+              validator: (value) {
+                if (value.isEmpty)
+                  return "Debe ingresar al menos un nombre de usuario.";
+                return null;
+              }),
+          SizedBox(height: 10, width: 0),
+          InputText(
               hint: "Correo electrónico",
-              onSaved: (value) => _email = value,
+              onSaved: (value) => _email = value.trim(),
               inputType: TextInputType.emailAddress,
               fontSize: 20,
               prefixIcon: Icons.mail_outline,
@@ -140,10 +141,10 @@ class _LoginPageState extends State<LoginPage> {
 
                 return null;
               }),
-          SizedBox(height: 20, width: 0),
+          SizedBox(height: 10, width: 0),
           InputText(
               hint: "Contraseña.",
-              onSaved: (value) => _password = value,
+              onSaved: (value) => _password = value.trim(),
               isSecure: true,
               prefixIcon: Icons.lock_outline,
               inputType: TextInputType.text,
@@ -154,25 +155,24 @@ class _LoginPageState extends State<LoginPage> {
                 return null;
               }),
           SizedBox(height: 10, width: 0),
-          CheckboxListTile(
-              title: Text('Recuerdame.',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w500)),
-              activeColor: Colors.white,
-              checkColor: Colors.green,
-              value: _rememberMe,
-              onChanged: (bool value) {
-                setState(() {
-                  _rememberMe = value;
-                });
+          InputText(
+              hint: "Confirme su contraseña.",
+              onSaved: (value) => _passwordConfirmation = value.trim(),
+              isSecure: true,
+              prefixIcon: Icons.lock,
+              inputType: TextInputType.text,
+              fontSize: 20,
+              validator: (value) {
+                if (value.isEmpty) return "La contraseña está vacia.";
+                return null;
               }),
-          SizedBox(height: 40, width: 0),
+          SizedBox(height: 20, width: 0),
           FlatButton(
               color: utils.accent,
               child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 2),
                   child: Text(
-                    _isLoading ? 'Autenticando...' : 'INICIAR SESIÓN',
+                    _isLoading ? 'Registrandose...' : 'REGISTRATE',
                     style: TextStyle(
                         fontSize: 20.0,
                         color: Colors.white,
@@ -183,59 +183,45 @@ class _LoginPageState extends State<LoginPage> {
                 setState(() {
                   _isLoading = true;
                 });
-                _loginUser(context);
+
+                _registerUser(context);
               }),
-          Text('Olvide mi contraseña', style: utils.estBodyAccent14),
         ],
       ),
     );
   }
 
-  // dynamic _loginUser(BuildContext context) async {
-  //   if (!LoginPage._formKey.currentState.validate()) return null;
-
-  //   LoginPage._formKey.currentState.save();
-
-  //   utils.user = await DBProvider.db.getUserByName(_name);
-  //   if (utils.user == null) {
-  //     utils.showToast(context, "El usuario no existe.");
-  //     return null;
-  //   }
-
-  //   if (!await DBProvider.db.verifyUserPass(_name, _pass)) {
-  //     utils.showToast(context, 'Contraseña incorrecta.');
-  //     return null;
-  //   }
-
-  //   Navigator.of(context).pushReplacementNamed('home');
-
-  //   //Navigator.of(context).pushNamed('/');
-  // }
-
-  void _loginUser(BuildContext context) async {
-    if (!LoginPage._formKey.currentState.validate()) {
+  void _registerUser(BuildContext context) async {
+    if (!RegisterPage._registerFormKey.currentState.validate()) {
       _isLoading = false;
       return null;
     }
 
-    LoginPage._formKey.currentState.save();
+    RegisterPage._registerFormKey.currentState.save();
 
     var data = {
-      'email': _email.trim(),
-      'password': _password.trim(),
-      'remember_me': _rememberMe
+      'name': _name,
+      'email': _email,
+      'password': _password,
+      'password_confirmation': _passwordConfirmation,
     };
+    if (_password.compareTo(_passwordConfirmation) != 0) {
+      utils.showToast(
+          context, "La contraseña y su confirmación deben coincidir.");
+      _isLoading = false;
+      return;
+    }
 
     var connectivity = await Connectivity().checkConnectivity();
 
     if (connectivity == ConnectivityResult.none) {
-      _loginFromDatabase(data, context);
+      _registerFromDatabase(data, context);
     } else {
-      _loginFromNetwork(data, context);
+      _registerFromNetwork(data, context);
     }
   }
 
-  _loginFromDatabase(data, context) async {
+  _registerFromDatabase(data, context) async {
     utils.showToast(context, 'Offline');
 
     utils.user = await DBProvider.db.getUserBy(field: 'email', value: _email);
@@ -262,31 +248,36 @@ class _LoginPageState extends State<LoginPage> {
       _isLoading = false;
     });
 
-    Navigator.of(context).pushReplacementNamed('home');
+    Navigator.of(context).pushReplacementNamed('login');
   }
 
-  _loginFromNetwork(data, context) async {
+  _registerFromNetwork(data, context) async {
     utils.showToast(context, 'Online');
 
-    var response = await Api().authData(data, '/auth/login');
+    //var response = await Api().authData(data, '/auth/signup');
+    var response =
+        await Api().setPostDataFromApi(url: '/auth/signup', data: data);
+
     var body = json.decode(response.body);
 
-    if (body['access_token'] != null) {
-      utils.user =
-          UserModel(id: body['id'], name: body['name'], email: body['email']);
-
-      FlutterSecureStorage storage = FlutterSecureStorage();
-      storage.write(key: 'access_token', value: body['access_token']);
-      storage.write(key: 'token_type', value: body['token_type']);
-      storage.write(key: 'expires_at', value: body['expires_at']);
-
-      Navigator.of(context).pushReplacementNamed('home');
+    if (response.statusCode == 201 && body['user']['id'] != null) {
+      Navigator.of(context).pop();
     } else {
       setState(() {
         _isLoading = false;
       });
 
-      utils.showSnack('Mensaje', body['message'], context);
+      String msg = '';
+
+      if (body['message'] == null) return;
+      msg = body['message'].toString() + "\n";
+
+      if (body['errors'] == null) return;
+      body['errors'].forEach((key, value) {
+        msg += " - $key: $value\n";
+      });
+
+      utils.showSnack('Mensaje', msg, context);
     }
   }
 }

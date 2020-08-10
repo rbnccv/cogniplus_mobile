@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class AdultoModel {
   int id;
   String rut;
@@ -37,6 +39,23 @@ class AdultoModel {
       this.m3v,
       this.m4v,
       this.infoAdicional});
+
+  static AdultoModel toAdultoModelFromNetwork({String string}) {
+    final jsonData = json.decode(string);
+
+    return AdultoModel(
+      id: jsonData["id"],
+      rut: jsonData["rut"],
+      nombres: jsonData["names"],
+      apellidos: jsonData["last_names"],
+      sexo: jsonData["gender"].toString(),
+      escolaridad: jsonData["course"],
+      fechaNacimiento: jsonData["birthday"],
+      ingresos: jsonData["revenue"].toString(),
+      fono: jsonData["phone"],
+      infoAdicional: jsonData["info"],
+    );
+  }
 
   factory AdultoModel.fromJson(Map<String, dynamic> json) => AdultoModel(
       id: json['id'],
