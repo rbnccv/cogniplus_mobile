@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
+import 'package:cogniplus_mobile/src/pages/form_adulto_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:cogniplus_mobile/src/providers/db_provider.dart';
 import 'package:connectivity/connectivity.dart';
@@ -25,7 +26,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   GlobalKey<RefreshIndicatorState> _refreshKey;
-  var _connectivity;
+  ConnectivityResult _connectivity;
 
   @override
   void initState() {
@@ -58,7 +59,11 @@ class _HomePageState extends State<HomePage> {
           size: 50.0,
         ),
         backgroundColor: Theme.of(context).primaryColor,
-        onPressed: () => Navigator.of(context).pushNamed('formadulto'),
+        onPressed: () {
+          //Navigator.of(context).pushNamed('formadulto');
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => FormAdultoPage(adultoId: 0)));
+        },
       ),
     );
   }
@@ -124,8 +129,11 @@ class _HomePageState extends State<HomePage> {
                         onPressed: () {
                           //SystemSound.play(SystemSoundType.click);
 
-                          Navigator.of(context)
-                              .pushNamed('video', arguments: list[index].id);
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  FormAdultoPage(adultoId: list[index].id)));
+                          // Navigator.of(context)
+                          //     .pushNamed('video', arguments: list[index].id);
                         }),
                   ),
                 ),
@@ -138,8 +146,9 @@ class _HomePageState extends State<HomePage> {
                   onTap: () async {
                     // Navigator.of(context)
                     //     .pushReplacement('formadulto', arguments: list[index].id);
-                    Navigator.of(context).pushReplacementNamed('formadulto',
-                        arguments: list[index].id);
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            FormAdultoPage(adultoId: list[index].id)));
                   },
                 ),
               ],
@@ -190,9 +199,7 @@ class _HomePageState extends State<HomePage> {
     var id = utils.user.id;
     var response =
         await Api().getDataFromApi(url: '/user/' + id.toString() + '/seniors');
-    // var body = (json.decode(response.body) as List)
-    //     .map((e) => AdultoModel.fromJson(e))
-    //     .toList();
+
     var body = (json.decode(response.body) as List).map((json) {
       return AdultoModel(
           id: json['id'],

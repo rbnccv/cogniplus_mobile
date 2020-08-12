@@ -15,13 +15,22 @@ import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 enum TipoSexo { masculino, femenino }
 
 class FormAdultoPage extends StatefulWidget {
+  final int adultoId;
+
+  FormAdultoPage({@required this.adultoId});
+
   @override
   _FormAdultoPageState createState() => _FormAdultoPageState();
 }
 
 class _FormAdultoPageState extends State<FormAdultoPage> {
+  ConnectivityResult _connectivity;
   static final _formKey = GlobalKey<FormState>();
+
+  int _id = 0;
+  AdultoModel _adulto;
   int _radioValue = 1;
+  bool _isUpdate = false;
 
   List<String> _gradoEscolaridad = [
     'Enseñanza básica incompleta',
@@ -32,7 +41,6 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
     'Enseñanza superior completa'
   ];
 
-  int _id = 0;
   String _nombre,
       _apellidos,
       _sexo,
@@ -51,15 +59,15 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
   TextEditingController _infoTextController = new TextEditingController();
   TextEditingController _fonoTextController = new TextEditingController();
 
-  bool _isUpdate = false;
-
   @override
   void initState() {
     super.initState();
-    Timer.run(() {
-      final AdultoModel adulto = ModalRoute.of(context).settings.arguments;
-      if (adulto != null) _setFormFields(adulto);
-    });
+    _setConnectivity();
+
+    if (widget.adultoId != 0) {
+      _getAdulto(adultoId: widget.adultoId);
+    }
+
     _nombre = '';
     _apellidos = '';
     _sexo = 'M';
@@ -80,11 +88,15 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
     _rutTextController.dispose();
     _infoTextController.dispose();
     _fonoTextController.dispose();
+
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Scaffold build(BuildContext context) {
+    setState(() {
+      if (_adulto != null) _setFormFields(_adulto);
+    });
     return Scaffold(
       backgroundColor: Color(0xffE6E6E6),
       appBar: _appbar(context),
@@ -94,7 +106,7 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
     );
   }
 
-  _appbar(BuildContext context) {
+  AppBar _appbar(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
       title: Row(
@@ -115,26 +127,7 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
     );
   }
 
-  _setFormFields(AdultoModel adulto) {
-    _id = adulto.id;
-    _nombreTextController.text = adulto.nombres;
-    _apellidoTextController.text = adulto.apellidos;
-
-    _escolaridad = adulto.escolaridad;
-    _fechaNacimiento = adulto.fechaNacimiento;
-    _ingresosTextController.text = adulto.ingresos;
-    _rutTextController.text = adulto.rut;
-    _fonoTextController.text = adulto.fono;
-    _infoTextController.text = adulto.infoAdicional;
-    _isUpdate = true;
-
-    setState(() {
-      _radioValue = (adulto.sexo == 'F') ? 0 : 1;
-      _sexo = adulto.sexo;
-    });
-  }
-
-  Widget _getForm(BuildContext context) {
+  Container _getForm(BuildContext context) {
     double width = MediaQuery.of(context).size.width / 2 - 40;
     final inputDecorator = InputDecoration(
         fillColor: Colors.white,
@@ -374,7 +367,7 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
             )));
   }
 
-  Widget _recordButton(BuildContext context) {
+  FlatButton _recordButton(BuildContext context) {
     return FlatButton(
       color: Theme.of(context).primaryColor,
       child: Text('REGISTRAR',
@@ -384,6 +377,171 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
               fontWeight: FontWeight.bold)),
       onPressed: () => _registrarAnciano(context),
     );
+  }
+
+  Container _makeRadioButton(double width, BuildContext context) {
+    bool isLandScape =
+        (MediaQuery.of(context).orientation == Orientation.landscape);
+    return Container(
+        width: width,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text('Sexo:',
+                  style:
+                      TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
+              Flex(
+                  direction: isLandScape ? Axis.horizontal : Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Radio(
+                            activeColor: utils.primary,
+                            value: 1,
+                            groupValue: _radioValue,
+                            onChanged: (value) => setState(() {
+                                  _radioValue = value;
+                                  _sexo = "M";
+                                })),
+                        Text('Masculino', style: TextStyle(fontSize: 14.0)),
+                      ],
+                    ),
+                    (isLandScape)
+                        ? Container(
+                            height: 20.0,
+                            width: 2.0,
+                            color: Colors.grey,
+                            margin: const EdgeInsets.only(left: 9.0, right: 0))
+                        : Container(
+                            height: 2.0,
+                            width: double.infinity,
+                            color: Colors.grey,
+                            margin: const EdgeInsets.only(left: 9.0, right: 0)),
+                    Row(
+                      children: <Widget>[
+                        Radio(
+                            activeColor: utils.primary,
+                            value: 0,
+                            groupValue: _radioValue,
+                            onChanged: (value) => setState(() {
+                                  _radioValue = value;
+                                  _sexo = "F";
+                                })),
+                        Text('Femenino', style: TextStyle(fontSize: 14.0))
+                      ],
+                    ),
+                  ])
+            ]));
+  }
+
+  Container _makeDropdown(double width) {
+    return Container(
+        width: width,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text('Grado de escolaridad:',
+                  style:
+                      TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                ),
+                child: DropdownButton(
+                    underline: Container(
+                        height: 1.0,
+                        decoration: const BoxDecoration(
+                            border: Border(
+                                bottom: BorderSide(
+                                    color: Colors.transparent, width: 0.0)))),
+                    isExpanded: true,
+                    value: _escolaridad,
+                    style: TextStyle(fontSize: 14, color: Colors.black),
+                    items: getOpcionesDropdown(),
+                    onChanged: (opt) {
+                      setState(() => _escolaridad = opt);
+                    }),
+              )
+            ]));
+  }
+
+  List<DropdownMenuItem<String>> getOpcionesDropdown() {
+    List<DropdownMenuItem<String>> lista = new List();
+
+    _gradoEscolaridad.forEach((opt) {
+      lista.add(DropdownMenuItem(
+        child: Text('  $opt'),
+        value: opt,
+      ));
+    });
+
+    return lista;
+  }
+
+  FlatButton _makeDate(BuildContext context) {
+    return FlatButton(
+      onPressed: () {
+        DatePicker.showDatePicker(
+          context,
+          showTitleActions: true,
+          minTime: DateTime(1900),
+          maxTime: DateTime(2050),
+          onConfirm: (DateTime date) {
+            setState(() {
+              _fechaNacimiento = DateFormat('dd-MM-yyyy').format(date);
+            });
+          },
+          locale: LocaleType.es,
+        );
+      },
+      color: Colors.white,
+      child: Text(
+        '$_fechaNacimiento',
+        style: TextStyle(fontSize: 14),
+      ),
+    );
+  }
+
+  _setConnectivity() async {
+    _connectivity = await Connectivity().checkConnectivity();
+  }
+
+  _getAdulto({int adultoId, BuildContext context}) {
+    if (_connectivity == ConnectivityResult.none) {
+      _fromDatabase(adultoId: adultoId, context: context);
+    } else {
+      _fromNetwork(adultoId: adultoId, context: context);
+    }
+  }
+
+  _fromNetwork({int adultoId, BuildContext context}) async {
+    var response =
+        await Api().getDataFromApi(url: '/seniors/' + adultoId.toString());
+    var body = response.body;
+    _adulto = AdultoModel.toAdultoModelFromNetwork(string: body);
+  }
+
+  _fromDatabase({int adultoId, BuildContext context}) {
+    _adulto = AdultoModel();
+  }
+
+  _setFormFields(AdultoModel adulto) {
+    _id = adulto.id;
+    _nombreTextController.text = adulto.nombres;
+    _apellidoTextController.text = adulto.apellidos;
+    _escolaridad = adulto.escolaridad;
+    _fechaNacimiento = adulto.fechaNacimiento;
+    _ingresosTextController.text = adulto.ingresos;
+    _rutTextController.text = adulto.rut;
+    _fonoTextController.text = adulto.fono;
+    _infoTextController.text = adulto.infoAdicional;
+    _isUpdate = true;
+
+    setState(() {
+      _radioValue = (adulto.sexo == 'F') ? 0 : 1;
+      _sexo = adulto.sexo;
+    });
   }
 
   _registrarAnciano(BuildContext context) async {
@@ -467,129 +625,5 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
 
     //utils.showToast(_formKey.currentContext, body.toString());
     print("DEBUG:" + body.toString());
-  }
-
-  Widget _makeRadioButton(double width, BuildContext context) {
-    bool isLandScape =
-        (MediaQuery.of(context).orientation == Orientation.landscape);
-    return Container(
-        width: width,
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text('Sexo:',
-                  style:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
-              Flex(
-                  direction: isLandScape ? Axis.horizontal : Axis.vertical,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Radio(
-                            activeColor: utils.primary,
-                            value: 1,
-                            groupValue: _radioValue,
-                            onChanged: (value) => setState(() {
-                                  _radioValue = value;
-                                  _sexo = "M";
-                                })),
-                        Text('Masculino', style: TextStyle(fontSize: 14.0)),
-                      ],
-                    ),
-                    (isLandScape)
-                        ? Container(
-                            height: 20.0,
-                            width: 2.0,
-                            color: Colors.grey,
-                            margin: const EdgeInsets.only(left: 9.0, right: 0))
-                        : Container(
-                            height: 2.0,
-                            width: double.infinity,
-                            color: Colors.grey,
-                            margin: const EdgeInsets.only(left: 9.0, right: 0)),
-                    Row(
-                      children: <Widget>[
-                        Radio(
-                            activeColor: utils.primary,
-                            value: 0,
-                            groupValue: _radioValue,
-                            onChanged: (value) => setState(() {
-                                  _radioValue = value;
-                                  _sexo = "F";
-                                })),
-                        Text('Femenino', style: TextStyle(fontSize: 14.0))
-                      ],
-                    ),
-                  ])
-            ]));
-  }
-
-  Widget _makeDropdown(double width) {
-    return Container(
-        width: width,
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text('Grado de escolaridad:',
-                  style:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-                child: DropdownButton(
-                    underline: Container(
-                        height: 1.0,
-                        decoration: const BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                    color: Colors.transparent, width: 0.0)))),
-                    isExpanded: true,
-                    value: _escolaridad,
-                    style: TextStyle(fontSize: 14, color: Colors.black),
-                    items: getOpcionesDropdown(),
-                    onChanged: (opt) {
-                      setState(() => _escolaridad = opt);
-                    }),
-              )
-            ]));
-  }
-
-  List<DropdownMenuItem<String>> getOpcionesDropdown() {
-    List<DropdownMenuItem<String>> lista = new List();
-
-    _gradoEscolaridad.forEach((opt) {
-      lista.add(DropdownMenuItem(
-        child: Text('  $opt'),
-        value: opt,
-      ));
-    });
-
-    return lista;
-  }
-
-  Widget _makeDate(BuildContext context) {
-    return FlatButton(
-      onPressed: () {
-        DatePicker.showDatePicker(
-          context,
-          showTitleActions: true,
-          minTime: DateTime(1900),
-          maxTime: DateTime(2050),
-          onConfirm: (DateTime date) {
-            setState(() {
-              _fechaNacimiento = DateFormat('dd-MM-yyyy').format(date);
-            });
-          },
-          locale: LocaleType.es,
-        );
-      },
-      color: Colors.white,
-      child: Text(
-        '$_fechaNacimiento',
-        style: TextStyle(fontSize: 14),
-      ),
-    );
   }
 }

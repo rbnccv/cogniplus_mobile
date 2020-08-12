@@ -26,12 +26,39 @@ class VideoPage extends StatefulWidget {
 }
 
 class _VideoPageState extends State<VideoPage> {
-  BuildContext navigatorKey;
-  bool _dialVisible = true;
+  final imgUrl = "https://unsplash.com/photos/iEJVyyevw-U/download?force=true";
+  bool downloading = false;
+  var progressString = "";
 
+  BuildContext navigatorKey;
   @override
   void initState() {
     super.initState();
+    downloadFile();
+  }
+
+  Future<void> downloadFile() async {
+    Dio dio = Dio();
+    try {
+      var dir = await getApplicationDocumentsDirectory();
+
+      await dio.download(imgUrl, "${dir.path}/myImage.jpg",
+          onReceiveProgress: (rec, total) {
+        print("Rec:, $rec, total");
+
+        setState(() {
+          downloading = true;
+          progressString = ((rec / total) * 100).toStringAsFixed(0) + "%";
+        });
+      });
+    } catch (e) {
+      print(e);
+    }
+    setState(() {
+      downloading = false;
+      progressString = "completed";
+    });
+    print("Download completed");
   }
 
   @override
@@ -139,29 +166,82 @@ class _VideoPageState extends State<VideoPage> {
     );
   }
 
+  bool _dialVisible = true;
   _getBody(BuildContext context) {
-    return Center();
+    return Center(
+      child: downloading
+          ? Container(
+              height: 120.0,
+              width: 200.0,
+              child: Card(
+                color: Colors.black,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    Text(
+                      "Downloading File: $progressString",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            )
+          : Text("No Data"),
+    );
   }
 }
 
-class VideoWidget extends StatefulWidget {
-  final String title;
-  final List<VideoPlayerController> controllers;
-
-  VideoWidget({this.title = "Demo", this.controllers});
-  _VideoWidget createState() => _VideoWidget();
+class Videoplayer extends StatefulWidget {
+  final String route;
+  const Videoplayer({Key key, this.route}) : super(key: key);
+  _Videoplayer createState() => _Videoplayer();
 }
 
-class _VideoWidget extends State<VideoWidget> {
-  TargetPlatform _platform;
+class _Videoplayer extends State<Videoplayer> {
+  ChewieController _chewieController;
+  VideoPlayerController _controller;
 
   @override
   void initState() {
     super.initState();
+    _controller = new VideoPlayerController.asset(widget.route);
+    _chewieController = ChewieController(
+        videoPlayerController: _controller,
+        aspectRatio: 16 / 9,
+        autoInitialize: true,
+        looping: false,
+        showControls: true,
+        autoPlay: true,
+        placeholder: Container(
+          color: Colors.transparent,
+        ),
+        errorBuilder: (context, msg) {
+          return Center(
+            child: Text(
+              msg,
+              style: TextStyle(color: Colors.white),
+            ),
+          );
+        });
+  }
+
+  @override
+  void dispose() {
+    _chewieController.dispose();
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView();
+    return Chewie(
+      controller: _chewieController,
+    );
   }
 }
