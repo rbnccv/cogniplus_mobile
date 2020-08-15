@@ -143,9 +143,10 @@ class _VideoPageState extends State<VideoPage> {
     return Center();
   }
 }
-
+/*
 class VideoWidget extends StatefulWidget {
   final String title;
+  //final List<VideoPlayerController> controllers;
   final List<VideoPlayerController> controllers;
 
   VideoWidget({this.title = "Demo", this.controllers});
@@ -156,12 +157,38 @@ class _VideoWidget extends State<VideoWidget> {
   TargetPlatform _platform;
 
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
+    return ListView(
+      children: widget.controllers.map((ctrl) {
+        return Container(
+          margin: new EdgeInsets.symmetric(vertical: 20),
+          child: ChewieController(
+            videoPlayerController: ctrl,
+            aspectRatio: 16 / 9,
+            autoInitialize: true,
+            looping: false,
+            showControls: true,
+            autoPlay: true,
+            errorBuilder: (context, errorMessage) {
+              return Center(
+                child: Text(
+                  errorMessage,
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            },
+            placeholder: Container(
+              color: Colors.transparent,
+            ),
+          ),
+        );
+      }).toList(),
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ListView();
+  void initState() {
+    super.initState();
   }
-}
+  
+}*/

@@ -49,4 +49,11 @@ class Api {
     await _getToken();
     return await http.post(fullUrl, headers: _setHeaders(), body: data);
   }
+  
+  setUpdateDataFromApi({String url, data}) async {
+    String fullUrl = _url + url;
+    data = jsonEncode(data);
+    await _getToken();
+    return await http.patch(fullUrl, headers: _setHeaders(), body: data);
+  }
 }

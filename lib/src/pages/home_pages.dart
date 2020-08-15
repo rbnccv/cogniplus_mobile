@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
         onPressed: () {
           //Navigator.of(context).pushNamed('formadulto');
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (BuildContext context) => FormAdultoPage(adultoId: 0)));
+              builder: (BuildContext context) => FormAdultoPage()));
         },
       ),
     );
@@ -129,11 +129,11 @@ class _HomePageState extends State<HomePage> {
                         onPressed: () {
                           //SystemSound.play(SystemSoundType.click);
 
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  FormAdultoPage(adultoId: list[index].id)));
-                          // Navigator.of(context)
-                          //     .pushNamed('video', arguments: list[index].id);
+                          // Navigator.of(context).push(MaterialPageRoute(
+                          //     builder: (BuildContext context) =>
+                          //         FormAdultoPage(adulto: list[index])));
+                          Navigator.of(context)
+                              .pushNamed('video', arguments: list[index].id);
                         }),
                   ),
                 ),
@@ -144,11 +144,11 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.black45,
                   icon: Icons.mode_edit,
                   onTap: () async {
-                    // Navigator.of(context)
-                    //     .pushReplacement('formadulto', arguments: list[index].id);
+                    //Navigator.of(context)
+                    //    .pushNamed('formadulto', arguments: list[index]);
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            FormAdultoPage(adultoId: list[index].id)));
+                            FormAdultoPage(adulto: list[index])));
                   },
                 ),
               ],

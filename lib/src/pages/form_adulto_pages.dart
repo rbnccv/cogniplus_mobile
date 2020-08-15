@@ -15,9 +15,9 @@ import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 enum TipoSexo { masculino, femenino }
 
 class FormAdultoPage extends StatefulWidget {
-  final int adultoId;
+  final AdultoModel adulto;
 
-  FormAdultoPage({@required this.adultoId});
+  FormAdultoPage({this.adulto});
 
   @override
   _FormAdultoPageState createState() => _FormAdultoPageState();
@@ -62,22 +62,21 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
   @override
   void initState() {
     super.initState();
-    _setConnectivity();
 
-    if (widget.adultoId != 0) {
-      _getAdulto(adultoId: widget.adultoId);
+    if (widget.adulto != null) {
+      _setFormFields(widget.adulto);
+    } else {
+      _nombre = '';
+      _apellidos = '';
+      _sexo = 'M';
+      _escolaridad = 'Enseñanza básica incompleta';
+      _fechaNacimiento = DateFormat('dd-MM-yyyy').format(DateTime.now());
+      _ingresos = '';
+      _rut = '';
+      _email = '';
+      _fonoTextController.text = '(56) 9';
+      _info = '';
     }
-
-    _nombre = '';
-    _apellidos = '';
-    _sexo = 'M';
-    _escolaridad = 'Enseñanza básica incompleta';
-    _fechaNacimiento = DateFormat('dd-MM-yyyy').format(DateTime.now());
-    _ingresos = '';
-    _rut = '';
-    _email = '';
-    _fonoTextController.text = '(56) 9';
-    _info = '';
   }
 
   @override
@@ -527,10 +526,16 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
   }
 
   _setFormFields(AdultoModel adulto) {
+    bool isInGrade = _gradoEscolaridad
+        .toString()
+        .toLowerCase()
+        .contains(adulto.escolaridad.toLowerCase());
+
     _id = adulto.id;
     _nombreTextController.text = adulto.nombres;
     _apellidoTextController.text = adulto.apellidos;
-    _escolaridad = adulto.escolaridad;
+    _escolaridad =
+        isInGrade ? adulto.escolaridad : "Enseñanza básica incompleta";
     _fechaNacimiento = adulto.fechaNacimiento;
     _ingresosTextController.text = adulto.ingresos;
     _rutTextController.text = adulto.rut;
@@ -618,12 +623,28 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
       "info": _fono
     };
 
-    var response =
-        await Api().setPostDataFromApi(url: '/seniors', data: senior);
+    String msg;
+    var body;
 
-    var body = json.decode(response.body);
-
+    try {
+      if (_isUpdate && _id != 0) {
+        //update
+        var response = await Api().setUpdateDataFromApi(
+            url: '/seniors/' + _id.toString(), data: senior);
+        body = json.decode(response.body);
+        msg = '${body["names"]}, actualizado.';
+      } else {
+        //insert
+        var response =
+            await Api().setPostDataFromApi(url: '/seniors', data: senior);
+        body = json.decode(response.body);
+        msg = '${body.data.nombre}, agregado.';
+      }
+    } catch (e) {
+      utils.showToast(context, e.toString());
+    }
+    utils.showToast(context, msg);
     //utils.showToast(_formKey.currentContext, body.toString());
-    print("DEBUG:" + body.toString());
+    
   }
 }
