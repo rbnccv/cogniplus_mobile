@@ -130,6 +130,7 @@ class _LoginPageState extends State<LoginPage> {
         children: <Widget>[
           InputText(
               hint: "Correo electrónico",
+              value: "rbnccv@gmail.com",
               onSaved: (value) => _email = value,
               inputType: TextInputType.emailAddress,
               fontSize: 20,
@@ -142,6 +143,7 @@ class _LoginPageState extends State<LoginPage> {
               }),
           SizedBox(height: 20, width: 0),
           InputText(
+            value: "password",
               hint: "Contraseña.",
               onSaved: (value) => _password = value,
               isSecure: true,

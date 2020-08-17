@@ -105,7 +105,7 @@ packages:
       name: crypto
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.4"
+    version: "2.1.5"
   csv:
     dependency: "direct main"
     description:
@@ -302,7 +302,7 @@ packages:
       name: mime
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.9.6+3"
+    version: "0.9.7"
   open_iconic_flutter:
     dependency: transitive
     description:
@@ -552,7 +552,7 @@ packages:
       name: video_player_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.0"
   video_player_web:
     dependency: transitive
     description:

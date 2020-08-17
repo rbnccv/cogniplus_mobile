@@ -55,11 +55,7 @@ flutter:
     - assets/svg/
     - assets/images/
     - assets/videos/
-    - assets/videos/modulo1/
-    - assets/videos/modulo2/
-    - assets/videos/modulo3/
-    - assets/videos/modulo4/
-
+    
   fonts:
     - family: Quicksand
       fonts:
