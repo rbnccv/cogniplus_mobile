@@ -143,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
               }),
           SizedBox(height: 20, width: 0),
           InputText(
-            value: "password",
+              value: "password",
               hint: "Contraseña.",
               onSaved: (value) => _password = value,
               isSecure: true,
@@ -270,25 +270,31 @@ class _LoginPageState extends State<LoginPage> {
   _loginFromNetwork(data, context) async {
     utils.showToast(context, 'Online');
 
-    var response = await Api().authData(data, '/auth/login');
-    var body = json.decode(response.body);
+    try {
+      var response = await Api().authData(data, '/auth/login');
+      var body = json.decode(response.body);
+      if (body['access_token'] != null) {
+        utils.user =
+            UserModel(id: body['id'], name: body['name'], email: body['email']);
 
-    if (body['access_token'] != null) {
-      utils.user =
-          UserModel(id: body['id'], name: body['name'], email: body['email']);
+        FlutterSecureStorage storage = FlutterSecureStorage();
+        storage.write(key: 'access_token', value: body['access_token']);
+        storage.write(key: 'token_type', value: body['token_type']);
+        storage.write(key: 'expires_at', value: body['expires_at']);
 
-      FlutterSecureStorage storage = FlutterSecureStorage();
-      storage.write(key: 'access_token', value: body['access_token']);
-      storage.write(key: 'token_type', value: body['token_type']);
-      storage.write(key: 'expires_at', value: body['expires_at']);
+        Navigator.of(context).pushReplacementNamed('home');
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
 
-      Navigator.of(context).pushReplacementNamed('home');
-    } else {
+        utils.showSnack('Mensaje', body['message'], context);
+      }
+    } catch (e) {
       setState(() {
         _isLoading = false;
+        utils.showSnack("Error", e.toString(), context);
       });
-
-      utils.showSnack('Mensaje', body['message'], context);
     }
   }
 }

@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:chewie/chewie.dart';
+import 'package:cogniplus_mobile/src/data/data.dart';
 import 'package:cogniplus_mobile/src/model/send_mail_mixin.dart';
 
 import 'package:cogniplus_mobile/src/providers/api.dart';
+import 'package:cogniplus_mobile/src/widgets/togglebar_widget.dart';
+import 'package:cogniplus_mobile/src/widgets/togglebtn_widget.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -140,55 +143,33 @@ class _VideoPageState extends State<VideoPage> {
   }
 
   _getBody(BuildContext context) {
-    return Center();
-  }
-}
-/*
-class VideoWidget extends StatefulWidget {
-  final String title;
-  //final List<VideoPlayerController> controllers;
-  final List<VideoPlayerController> controllers;
-
-  VideoWidget({this.title = "Demo", this.controllers});
-  _VideoWidget createState() => _VideoWidget();
-}
-
-class _VideoWidget extends State<VideoWidget> {
-  TargetPlatform _platform;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: widget.controllers.map((ctrl) {
-        return Container(
-          margin: new EdgeInsets.symmetric(vertical: 20),
-          child: ChewieController(
-            videoPlayerController: ctrl,
-            aspectRatio: 16 / 9,
-            autoInitialize: true,
-            looping: false,
-            showControls: true,
-            autoPlay: true,
-            errorBuilder: (context, errorMessage) {
-              return Center(
-                child: Text(
-                  errorMessage,
-                  style: TextStyle(color: Colors.white),
-                ),
-              );
-            },
-            placeholder: Container(
-              color: Colors.transparent,
-            ),
+    var modules = [m7, m6, m1, m2, m3, m4, m5, m6];
+    var videos = [m3, m5, m1, m2, m3, m4, m5, m6, m7];
+    return Center(
+      child: Column(
+        children: [
+          SizedBox(height: 20,),
+          SizedBox(
+            height: 72,
+            child: ToggleBar(
+                list: modules,
+                fieldVisited: "visited",
+                onSelected: (value) {
+                  print(value.toString());
+                }),
           ),
-        );
-      }).toList(),
+          SizedBox(height: 200),
+          SizedBox(
+            height: 72,
+            child: ToggleBar(
+                list: videos,
+                fieldVisited: "visited",
+                onSelected: (value) {
+                  print(value.toString());
+                }),
+          ),
+        ],
+      ),
     );
   }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-  
-}*/
+}
