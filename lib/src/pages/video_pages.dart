@@ -143,14 +143,17 @@ class _VideoPageState extends State<VideoPage> {
   }
 
   _getBody(BuildContext context) {
-    var modules = [m7, m6, m1, m2, m3, m4, m5, m6];
-    var videos = [m3, m5, m1, m2, m3, m4, m5, m6, m7];
+    var modules = [m1, m2, m3, m4, m5, m6, m7];
+    var videos = [v1, v2, v3, v4, v5, v6, v7];
     return Center(
       child: Column(
         children: [
-          SizedBox(height: 20,),
+          SizedBox(
+            height: 20,
+          ),
           SizedBox(
             height: 72,
+            width: 20,
             child: ToggleBar(
                 list: modules,
                 fieldVisited: "visited",
@@ -158,18 +161,80 @@ class _VideoPageState extends State<VideoPage> {
                   print(value.toString());
                 }),
           ),
-          SizedBox(height: 200),
+          SizedBox(height: 20),
+          SizedBox(
+            height: 200,
+            width: 400,
+            child: (url == "")
+                ? Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(0.5)),
+                        color: Colors.black),
+                  )
+                : VideoPlayer(url, UniqueKey()),
+          ),
+          SizedBox(height: 20),
           SizedBox(
             height: 72,
-            child: ToggleBar(
-                list: videos,
-                fieldVisited: "visited",
-                onSelected: (value) {
-                  print(value.toString());
-                }),
+            child: Center(
+              child: ToggleBar(
+                  list: videos,
+                  fieldVisited: "viewed",
+                  onSelected: (value) {
+                    setState(() {
+                      print(value);
+                      url = value['url'];
+                    });
+                  }),
+            ),
           ),
         ],
       ),
+    );
+  }
+}
+
+var url = "";
+
+class VideoPlayer extends StatefulWidget {
+  final String videoUrl;
+  final UniqueKey newKey;
+
+  VideoPlayer(this.videoUrl, this.newKey) : super(key: newKey);
+
+  @override
+  _VideoPlayerState createState() => _VideoPlayerState();
+}
+
+class _VideoPlayerState extends State<VideoPlayer> {
+  VideoPlayerController _videoPlayerController;
+  ChewieController _chewieController;
+
+  @override
+  void initState() {
+    this._initControllers(this.widget.videoUrl);
+    super.initState();
+  }
+
+  void _initControllers(String url) {
+    this._videoPlayerController = VideoPlayerController.network(url);
+    this._chewieController = ChewieController(
+      videoPlayerController: this._videoPlayerController,
+      autoPlay: true,
+    );
+  }
+
+  @override
+  void dispose() {
+    this._videoPlayerController?.dispose();
+    this._chewieController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Chewie(
+      controller: this._chewieController,
     );
   }
 }
