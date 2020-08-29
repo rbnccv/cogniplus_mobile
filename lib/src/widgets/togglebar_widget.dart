@@ -26,33 +26,39 @@ class _ToggleBarState extends State<ToggleBar> {
   @override
   Widget build(BuildContext context) {
     _list = widget.list;
-    return ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _list.length,
-        itemBuilder: (context, index) {
-          _isSelected = (_list[index]['id'] == _idSelected) ? true : false;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 8.0),
-            child: ToggleBtn(
-              digit: _list[index]['id'].toString(),
-              selected: _isSelected,
-              diameter: 52,
-              defaultIcon: Icons.lock,
-              iconColor: Colors.white,
-              foreground: Colors.white,
-              background: utils.primary,
-              selectedForegroundColor: Colors.black87,
-              selectedBackgroundColor: Colors.blueGrey[600],
-              visited: _list[index][widget.fieldVisited],
-              onPressed: () {
-                setState(() {
-                  _list[index][widget.fieldVisited] = true;
-                  _idSelected = _list[index]['id'];
-                  widget.onSelected(_list[index]);
-                });
-              },
-            ),
-          );
-        });
+    return Container(
+      color: Colors.green,
+      
+      padding: EdgeInsets.symmetric(horizontal: 40),
+      child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: _list.length,
+          itemBuilder: (context, index) {
+            _isSelected = (_list[index]['id'] == _idSelected) ? true : false;
+            return Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 2.0, vertical: 8.0),
+              child: ToggleBtn(
+                digit: _list[index]['id'].toString(),
+                selected: _isSelected,
+                diameter: 52,
+                defaultIcon: Icons.lock,
+                iconColor: Colors.white,
+                foreground: Colors.white,
+                background: utils.primary,
+                selectedForegroundColor: Colors.black87,
+                selectedBackgroundColor: Colors.blueGrey[600],
+                visited: _list[index][widget.fieldVisited],
+                onPressed: () {
+                  setState(() {
+                    _list[index][widget.fieldVisited] = true;
+                    _idSelected = _list[index]['id'];
+                    widget.onSelected(_list[index]);
+                  });
+                },
+              ),
+            );
+          }),
+    );
   }
 }

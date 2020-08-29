@@ -34,7 +34,21 @@ var m1 = {
     'visited': false,
   };
 
-
+  var m8 = {
+    'id': 8,
+    'name': 'modulo n°5',
+    'visited': false,
+  };
+  var m9 = {
+    'id': 9,
+    'name': 'modulo n°5',
+    'visited': false,
+  };
+  var m10 = {
+    'id': 10,
+    'name': 'modulo n°5',
+    'visited': false,
+  };
 
   var v1 = {
     'id': 1,
@@ -75,6 +89,26 @@ var m1 = {
   var v7 = {
     'id': 7,
     'name': 'video °7',
+    'url': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+    'viewed': false,
+  };
+  var v8 = {
+    'id': 7,
+    'name': 'video °8',
+    'url': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+    'viewed': false,
+  };
+
+  var v9 = {
+    'id': 7,
+    'name': 'video °9',
+    'url': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+    'viewed': false,
+  };
+
+  var v10 = {
+    'id': 7,
+    'name': 'video °10',
     'url': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
     'viewed': false,
   };

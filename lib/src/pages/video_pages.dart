@@ -143,19 +143,20 @@ class _VideoPageState extends State<VideoPage> {
   }
 
   _getBody(BuildContext context) {
-    var modules = [m1, m2, m3, m4, m5, m6, m7];
+    double parentWidth = double.infinity;
+    var modules = [m1];
     var videos = [v1, v2, v3, v4, v5, v6, v7];
     return Center(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           SizedBox(
             height: 72,
-            width: 20,
+            width: parentWidth,
             child: ToggleBar(
                 list: modules,
+                
                 fieldVisited: "visited",
                 onSelected: (value) {
                   print(value.toString());
@@ -176,6 +177,7 @@ class _VideoPageState extends State<VideoPage> {
           SizedBox(height: 20),
           SizedBox(
             height: 72,
+            width: parentWidth,
             child: Center(
               child: ToggleBar(
                   list: videos,
