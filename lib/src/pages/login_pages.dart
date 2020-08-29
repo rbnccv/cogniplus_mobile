@@ -143,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
               }),
           SizedBox(height: 20, width: 0),
           InputText(
-              value: "password",
+              value: "oracle_4U",
               hint: "Contraseña.",
               onSaved: (value) => _password = value,
               isSecure: true,
@@ -152,6 +152,8 @@ class _LoginPageState extends State<LoginPage> {
               fontSize: 20,
               validator: (value) {
                 if (value.isEmpty) return "La contraseña está vacia.";
+
+                print(value.toString());
 
                 return null;
               }),
