@@ -638,7 +638,7 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
         var response =
             await Api().setPostDataFromApi(url: '/seniors', data: senior);
         body = json.decode(response.body);
-        msg = '${body.data.nombre}, agregado.';
+        msg = '${body["names"]}, agregado.';
       }
     } catch (e) {
       utils.showToast(context, e.toString());
