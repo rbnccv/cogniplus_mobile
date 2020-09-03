@@ -31,6 +31,7 @@ class VideoPage extends StatefulWidget {
 class _VideoPageState extends State<VideoPage> {
   BuildContext navigatorKey;
   bool _dialVisible = true;
+  String url = "";
 
   @override
   void initState() {
@@ -156,7 +157,6 @@ class _VideoPageState extends State<VideoPage> {
             width: parentWidth,
             child: ToggleBar(
                 list: modules,
-                
                 fieldVisited: "visited",
                 onSelected: (value) {
                   print(value.toString());
@@ -196,7 +196,7 @@ class _VideoPageState extends State<VideoPage> {
   }
 }
 
-var url = "";
+//var url = "";
 
 class VideoPlayer extends StatefulWidget {
   final String videoUrl;
@@ -221,9 +221,19 @@ class _VideoPlayerState extends State<VideoPlayer> {
   void _initControllers(String url) {
     this._videoPlayerController = VideoPlayerController.network(url);
     this._chewieController = ChewieController(
-      videoPlayerController: this._videoPlayerController,
-      autoPlay: true,
-    );
+        videoPlayerController: this._videoPlayerController,
+        autoInitialize: true,
+        looping: false,
+        showControls: true,
+        autoPlay: true,
+        errorBuilder: (context, errorMessage) {
+          return Center(
+            child: Text(
+              errorMessage,
+              style: TextStyle(color: Colors.white),
+            ),
+          );
+        });
   }
 
   @override
