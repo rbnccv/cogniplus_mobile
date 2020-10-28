@@ -143,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
               }),
           SizedBox(height: 20, width: 0),
           InputText(
-              value: "oracle_4U",
+              value: "password",
               hint: "Contraseña.",
               onSaved: (value) => _password = value,
               isSecure: true,
@@ -275,6 +275,9 @@ class _LoginPageState extends State<LoginPage> {
     try {
       var response = await Api().authData(data, '/auth/login');
       var body = json.decode(response.body);
+
+      print(body.toString());
+      
       if (body['access_token'] != null) {
         utils.user =
             UserModel(id: body['id'], name: body['name'], email: body['email']);
