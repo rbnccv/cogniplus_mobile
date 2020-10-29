@@ -144,7 +144,7 @@ class _VideoPageState extends State<VideoPage> {
 
   _getBody(BuildContext context) {
     double parentWidth = double.infinity;
-    var modules = [m1];
+    var modules = [m1, m2, m3, m4];
     var videos = [v1, v2, v3, v4, v5, v6, v7];
     return Center(
       child: Column(
@@ -152,34 +152,36 @@ class _VideoPageState extends State<VideoPage> {
         children: [
           SizedBox(height: 20),
           SizedBox(
-            height: 72,
+            height: 82,
             width: parentWidth,
             child: ToggleBar(
                 list: modules,
+                padding: 10,
+                diameter: 62,
                 fieldVisited: "visited",
                 onSelected: (value) {
                   print(value.toString());
                 }),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 10),
           SizedBox(
             height: 200,
             width: 400,
             child: (url == "")
-                ? Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(0.5)),
-                        color: Colors.black),
-                  )
+                ? Image.asset("assets/images/default_video.png")
                 : VideoPlayer(url, UniqueKey()),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 10),
           SizedBox(
             height: 72,
             width: parentWidth,
             child: Center(
               child: ToggleBar(
                   list: videos,
+                  diameter: 52,
+                  padding: 5,
+                  background: Colors.grey[700],
+                  selectedBackgroundColor: utils.primary,
                   fieldVisited: "viewed",
                   onSelected: (value) {
                     setState(() {
