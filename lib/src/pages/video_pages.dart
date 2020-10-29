@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:chewie/chewie.dart';
 import 'package:cogniplus_mobile/src/data/data.dart';
 import 'package:cogniplus_mobile/src/model/send_mail_mixin.dart';
 
@@ -17,9 +16,9 @@ import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/model/historial_model.dart';
 import 'package:cogniplus_mobile/src/providers/db_provider.dart';
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
-import 'package:cogniplus_mobile/src/widgets/video_widget.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:video_player/video_player.dart';
+
+import 'package:cogniplus_mobile/src/widgets/videp_player_widget.dart';
 
 //Text('headline', style: Theme.of(context).textTheme.headline,),
 
@@ -197,56 +196,3 @@ class _VideoPageState extends State<VideoPage> {
 }
 
 //var url = "";
-
-class VideoPlayer extends StatefulWidget {
-  final String videoUrl;
-  final UniqueKey newKey;
-
-  VideoPlayer(this.videoUrl, this.newKey) : super(key: newKey);
-
-  @override
-  _VideoPlayerState createState() => _VideoPlayerState();
-}
-
-class _VideoPlayerState extends State<VideoPlayer> {
-  VideoPlayerController _videoPlayerController;
-  ChewieController _chewieController;
-
-  @override
-  void initState() {
-    this._initControllers(this.widget.videoUrl);
-    super.initState();
-  }
-
-  void _initControllers(String url) {
-    this._videoPlayerController = VideoPlayerController.network(url);
-    this._chewieController = ChewieController(
-        videoPlayerController: this._videoPlayerController,
-        autoInitialize: true,
-        looping: false,
-        showControls: true,
-        autoPlay: true,
-        errorBuilder: (context, errorMessage) {
-          return Center(
-            child: Text(
-              errorMessage,
-              style: TextStyle(color: Colors.white),
-            ),
-          );
-        });
-  }
-
-  @override
-  void dispose() {
-    this._videoPlayerController?.dispose();
-    this._chewieController?.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Chewie(
-      controller: this._chewieController,
-    );
-  }
-}

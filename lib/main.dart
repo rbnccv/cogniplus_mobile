@@ -8,7 +8,7 @@ import 'package:cogniplus_mobile/src/pages/cuestionario_pages.dart';
 import 'package:cogniplus_mobile/src/pages/evaluacion_pages.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-void main() => runApp(CogniApp());
+void main() => runApp(new CogniApp());
 
 class CogniApp extends StatelessWidget {
   final primary             = const Color(0xff67CABA);
