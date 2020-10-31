@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'togglebtn_widget.dart';
 
 class ToggleBar extends StatefulWidget {
-  final List<Map<String, dynamic>> list;
+  final Future<List<Map<String, dynamic>>> list;
   final void Function(Map<String, dynamic> value) onSelected;
   final String fieldVisited;
 
@@ -36,7 +36,7 @@ class ToggleBar extends StatefulWidget {
 }
 
 class _ToggleBarState extends State<ToggleBar> {
-  List<Map<String, dynamic>> _list;
+  Future<List<Map<String, dynamic>>> _list;
   int _idSelected = 0;
   bool _isSelected = false;
 
@@ -49,37 +49,40 @@ class _ToggleBarState extends State<ToggleBar> {
           child: Center(
             // color: Colors.green,
             // padding: EdgeInsets.symmetric(horizontal: 40),
-            child: ListView.builder(
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                itemCount: _list.length,
-                itemBuilder: (context, index) {
-                  _isSelected =
-                      (_list[index]['id'] == _idSelected) ? true : false;
-                  return Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: widget.padding, vertical: widget.padding),
-                    child: ToggleBtn(
-                      digit: _list[index]['id'].toString(),
-                      selected: _isSelected,
-                      diameter: widget.diameter,
-                      defaultIcon: widget.defaultIcon,
-                      iconColor: widget.iconColor,
-                      foreground: widget.foreground,
-                      background: widget.background,
-                      selectedForegroundColor: widget.selectedForegroundColor,
-                      selectedBackgroundColor: widget.selectedBackgroundColor,
-                      visited: _list[index][widget.fieldVisited],
-                      onPressed: () {
-                        setState(() {
-                          _list[index][widget.fieldVisited] = true;
-                          _idSelected = _list[index]['id'];
-                          widget.onSelected(_list[index]);
-                        });
-                      },
-                    ),
-                  );
-                }),
+            child: FutureBuilder(
+                builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+              return ListView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _list.length,
+                  itemBuilder: (context, index) {
+                    _isSelected =
+                        (_list[index]['id'] == _idSelected) ? true : false;
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: widget.padding, vertical: widget.padding),
+                      child: ToggleBtn(
+                        digit: _list[index]['id'].toString(),
+                        selected: _isSelected,
+                        diameter: widget.diameter,
+                        defaultIcon: widget.defaultIcon,
+                        iconColor: widget.iconColor,
+                        foreground: widget.foreground,
+                        background: widget.background,
+                        selectedForegroundColor: widget.selectedForegroundColor,
+                        selectedBackgroundColor: widget.selectedBackgroundColor,
+                        visited: _list[index][widget.fieldVisited],
+                        onPressed: () {
+                          setState(() {
+                            _list[index][widget.fieldVisited] = true;
+                            _idSelected = _list[index]['id'];
+                            widget.onSelected(_list[index]);
+                          });
+                        },
+                      ),
+                    );
+                  });
+            }),
           ),
         ),
       ],

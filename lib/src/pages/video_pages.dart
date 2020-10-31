@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/data/data.dart';
+import 'package:cogniplus_mobile/src/model/response_api.dart';
 import 'package:cogniplus_mobile/src/model/send_mail_mixin.dart';
 
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:cogniplus_mobile/src/widgets/togglebar_widget.dart';
 import 'package:cogniplus_mobile/src/widgets/togglebtn_widget.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -19,6 +21,7 @@ import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 import 'package:path_provider/path_provider.dart';
 
 import 'package:cogniplus_mobile/src/widgets/videp_player_widget.dart';
+import 'package:cogniplus_mobile/src/model/response_api.dart';
 
 //Text('headline', style: Theme.of(context).textTheme.headline,),
 
@@ -31,15 +34,21 @@ class _VideoPageState extends State<VideoPage> {
   BuildContext navigatorKey;
   bool _dialVisible = true;
   String url = "";
+  ConnectivityResult _connectivity;
 
   @override
   void initState() {
     super.initState();
+    _setConnectivity();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  _setConnectivity() async {
+    _connectivity = await Connectivity().checkConnectivity();
   }
 
   @override
@@ -144,8 +153,8 @@ class _VideoPageState extends State<VideoPage> {
 
   _getBody(BuildContext context) {
     double parentWidth = double.infinity;
-    var modules = [m1, m2, m3, m4];
-    var videos = [v1, v2, v3, v4, v5, v6, v7];
+    // var modules = [m1, m2, m3, m4];
+    // var videos = [v1, v2, v3, v4, v5, v6, v7];
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -177,7 +186,8 @@ class _VideoPageState extends State<VideoPage> {
             width: parentWidth,
             child: Center(
               child: ToggleBar(
-                  list: videos,
+                  list:
+                      _getResponse(context, "/senior_videos/"),
                   diameter: 52,
                   padding: 5,
                   background: Colors.grey[700],
@@ -195,6 +205,27 @@ class _VideoPageState extends State<VideoPage> {
       ),
     );
   }
-}
 
-//var url = "";
+  Future<List<Map<String, dynamic>>> _getResponse(BuildContext context, String url) async {
+    if (_connectivity == ConnectivityResult.none) {
+      return _fromDatabase(context);
+    } else {
+      return _fromNetwork(context, url);
+    }
+  }
+
+  Future<List<Map<String, dynamic>> _fromNetwork(BuildContext context, String url) async {
+    utils.showToast(context, "En linea");
+
+    var response =
+        await Api().getDataFromApi(url: url + utils.user.id.toString());
+
+    var body = responseApiFromJson(response.body);
+
+    return body.allViewedVideos.;
+  }
+
+  _fromDatabase(BuildContext context) async {
+    return null;
+  }
+}
