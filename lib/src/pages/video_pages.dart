@@ -36,10 +36,13 @@ class _VideoPageState extends State<VideoPage> {
   String url = "";
   ConnectivityResult _connectivity;
 
+  List<AllViewedVideo> _allVideos;
+  List<AllVisitedModule> _allModules;
+
   @override
   void initState() {
     super.initState();
-    _setConnectivity();
+    _setInit();
   }
 
   @override
@@ -47,8 +50,15 @@ class _VideoPageState extends State<VideoPage> {
     super.dispose();
   }
 
-  _setConnectivity() async {
+  _setInit() async {
     _connectivity = await Connectivity().checkConnectivity();
+
+    final ResponseApi response = await _getResponse();
+
+    _allVideos = response.allViewedVideos;
+    _allModules = response.allVisitedModules;
+
+    print("texto");
   }
 
   @override
@@ -153,8 +163,10 @@ class _VideoPageState extends State<VideoPage> {
 
   _getBody(BuildContext context) {
     double parentWidth = double.infinity;
-    // var modules = [m1, m2, m3, m4];
-    // var videos = [v1, v2, v3, v4, v5, v6, v7];
+
+    var modules = [m1, m2, m3, m4];
+    var videos = [v1, v2, v3, v4, v5, v6, v7];
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -186,8 +198,7 @@ class _VideoPageState extends State<VideoPage> {
             width: parentWidth,
             child: Center(
               child: ToggleBar(
-                  list:
-                      _getResponse(context, "/senior_videos/"),
+                  list: videos,
                   diameter: 52,
                   padding: 5,
                   background: Colors.grey[700],
@@ -206,26 +217,9 @@ class _VideoPageState extends State<VideoPage> {
     );
   }
 
-  Future<List<Map<String, dynamic>>> _getResponse(BuildContext context, String url) async {
-    if (_connectivity == ConnectivityResult.none) {
-      return _fromDatabase(context);
-    } else {
-      return _fromNetwork(context, url);
-    }
-  }
-
-  Future<List<Map<String, dynamic>> _fromNetwork(BuildContext context, String url) async {
-    utils.showToast(context, "En linea");
-
-    var response =
-        await Api().getDataFromApi(url: url + utils.user.id.toString());
-
-    var body = responseApiFromJson(response.body);
-
-    return body.allViewedVideos.;
-  }
-
-  _fromDatabase(BuildContext context) async {
-    return null;
+  _getResponse() async {
+    var response = await Api()
+        .getDataFromApi(url: "/senior_videos/" + utils.user.id.toString());
+    return responseApiFromJson(response.body);
   }
 }
