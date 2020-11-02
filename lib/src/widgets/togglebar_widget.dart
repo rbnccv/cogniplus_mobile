@@ -42,6 +42,7 @@ class _ToggleBarState extends State<ToggleBar> {
 
   @override
   Widget build(BuildContext context) {
+    //if(widget.list == null) return Container();
     _list = widget.list;
     return Column(
       children: [

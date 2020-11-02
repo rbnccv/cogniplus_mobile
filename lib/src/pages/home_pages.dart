@@ -205,7 +205,7 @@ class _HomePageState extends State<HomePage> {
           id: json['id'],
           nombres: json['names'],
           apellidos: json['last_names'],
-          //sexo: json['gender'].toString(),
+          //sexo: json['gender'].toString(),p
           escolaridad: json['course'],
           fechaNacimiento: json['birthday'],
           fono: json['phone'],

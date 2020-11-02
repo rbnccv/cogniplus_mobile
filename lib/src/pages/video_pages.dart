@@ -35,14 +35,13 @@ class _VideoPageState extends State<VideoPage> {
   bool _dialVisible = true;
   String url = "";
   ConnectivityResult _connectivity;
-
-  List<AllViewedVideo> _allVideos;
-  List<AllVisitedModule> _allModules;
+  Future _response;
 
   @override
   void initState() {
-    super.initState();
     _setInit();
+    _response = _getResponse();
+    super.initState();
   }
 
   @override
@@ -52,13 +51,6 @@ class _VideoPageState extends State<VideoPage> {
 
   _setInit() async {
     _connectivity = await Connectivity().checkConnectivity();
-
-    final ResponseApi response = await _getResponse();
-
-    _allVideos = response.allViewedVideos;
-    _allModules = response.allVisitedModules;
-
-    print("texto");
   }
 
   @override
@@ -163,63 +155,69 @@ class _VideoPageState extends State<VideoPage> {
 
   _getBody(BuildContext context) {
     double parentWidth = double.infinity;
-
-    var modules = [m1, m2, m3, m4];
-    var videos = [v1, v2, v3, v4, v5, v6, v7];
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(height: 20),
-          SizedBox(
-            height: 82,
-            width: parentWidth,
-            child: ToggleBar(
-                list: modules,
-                padding: 10,
-                diameter: 62,
-                fieldVisited: "visited",
-                onSelected: (value) {
-                  print(value.toString());
-                }),
-          ),
-          SizedBox(height: 10),
-          SizedBox(
-            height: 200,
-            width: 400,
-            child: (url == "")
-                ? Image.asset("assets/images/default_video.png")
-                : VideoPlayer(url, UniqueKey()),
-          ),
-          SizedBox(height: 10),
-          SizedBox(
-            height: 72,
-            width: parentWidth,
-            child: Center(
-              child: ToggleBar(
-                  list: videos,
-                  diameter: 52,
-                  padding: 5,
-                  background: Colors.grey[700],
-                  selectedBackgroundColor: utils.primary,
-                  fieldVisited: "viewed",
-                  onSelected: (value) {
-                    setState(() {
-                      print(value);
-                      url = value['url'];
-                    });
-                  }),
-            ),
-          ),
-        ],
-      ),
-    );
+    return FutureBuilder(
+        future: _response,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.hasData) {
+            final response = snapshot.data;
+            final modules = response['all_viewed_modules'];
+            var videos = [v1, v2, v3, v4, v5, v6, v7];
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 20),
+                  SizedBox(
+                    height: 82,
+                    width: parentWidth,
+                    child: ToggleBar(
+                        list: modules,
+                        padding: 10,
+                        diameter: 62,
+                        fieldVisited: "visited",
+                        onSelected: (value) {
+                          print(value.toString());
+                        }),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    height: 200,
+                    width: 400,
+                    child: (url == "")
+                        ? Image.asset("assets/images/default_video.png")
+                        : VideoPlayer(url, UniqueKey()),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    height: 72,
+                    width: parentWidth,
+                    child: Center(
+                      child: ToggleBar(
+                          list: videos,
+                          diameter: 52,
+                          padding: 5,
+                          background: Colors.grey[700],
+                          selectedBackgroundColor: utils.primary,
+                          fieldVisited: "viewed",
+                          onSelected: (value) {
+                            setState(() {
+                              print(value);
+                              url = value['url'];
+                            });
+                          }),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          return Center(child: CircularProgressIndicator());
+        });
   }
 
-  _getResponse() async {
+  Future<Map<String, dynamic>> _getResponse() async {
     var response = await Api()
         .getDataFromApi(url: "/senior_videos/" + utils.user.id.toString());
-    return responseApiFromJson(response.body);
+    return json.decode(response.body);
   }
 }
