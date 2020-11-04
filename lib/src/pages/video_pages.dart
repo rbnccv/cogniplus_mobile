@@ -35,12 +35,11 @@ class _VideoPageState extends State<VideoPage> {
   bool _dialVisible = true;
   String url = "";
   ConnectivityResult _connectivity;
-  Future _response;
+  Future<Map<String, dynamic>> _response;
 
   @override
   void initState() {
     _setInit();
-    _response = _getResponse();
     super.initState();
   }
 
@@ -50,6 +49,7 @@ class _VideoPageState extends State<VideoPage> {
   }
 
   _setInit() async {
+    _response = _getResponse();
     _connectivity = await Connectivity().checkConnectivity();
   }
 
@@ -157,60 +157,66 @@ class _VideoPageState extends State<VideoPage> {
     double parentWidth = double.infinity;
     return FutureBuilder(
         future: _response,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
-            final response = snapshot.data;
-            final modules = response['all_viewed_modules'];
-            var videos = [v1, v2, v3, v4, v5, v6, v7];
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(height: 20),
-                  SizedBox(
-                    height: 82,
-                    width: parentWidth,
-                    child: ToggleBar(
-                        list: modules,
-                        padding: 10,
-                        diameter: 62,
-                        fieldVisited: "visited",
-                        onSelected: (value) {
-                          print(value.toString());
-                        }),
-                  ),
-                  SizedBox(height: 10),
-                  SizedBox(
-                    height: 200,
-                    width: 400,
-                    child: (url == "")
-                        ? Image.asset("assets/images/default_video.png")
-                        : VideoPlayer(url, UniqueKey()),
-                  ),
-                  SizedBox(height: 10),
-                  SizedBox(
-                    height: 72,
-                    width: parentWidth,
-                    child: Center(
+        builder: (BuildContext context,
+            AsyncSnapshot<Map<String, dynamic>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData) {
+              final Map<String, dynamic> response = snapshot.data;
+              final List<Map<String, dynamic>> modules =
+                  response['all_visited_modules'];
+
+              var videos = [v1, v2, v3, v4, v5, v6, v7];
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 20),
+                    SizedBox(
+                      height: 82,
+                      width: parentWidth,
                       child: ToggleBar(
-                          list: videos,
-                          diameter: 52,
-                          padding: 5,
-                          background: Colors.grey[700],
-                          selectedBackgroundColor: utils.primary,
-                          fieldVisited: "viewed",
+                          list: modules,
+                          padding: 10,
+                          diameter: 62,
+                          fieldVisited: "visited",
                           onSelected: (value) {
-                            setState(() {
-                              print(value);
-                              url = value['url'];
-                            });
+                            print(value.toString());
                           }),
                     ),
-                  ),
-                ],
-              ),
-            );
+                    SizedBox(height: 10),
+                    SizedBox(
+                      height: 200,
+                      width: 400,
+                      child: (url == "")
+                          ? Image.asset("assets/images/default_video.png")
+                          : VideoPlayer(url, UniqueKey()),
+                    ),
+                    SizedBox(height: 10),
+                    SizedBox(
+                      height: 72,
+                      width: parentWidth,
+                      child: Center(
+                        child: ToggleBar(
+                            list: videos,
+                            diameter: 52,
+                            padding: 5,
+                            background: Colors.grey[700],
+                            selectedBackgroundColor: utils.primary,
+                            fieldVisited: "showed",
+                            onSelected: (value) {
+                              setState(() {
+                                print(value);
+                                url = value['url'];
+                              });
+                            }),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
           }
+
           return Center(child: CircularProgressIndicator());
         });
   }

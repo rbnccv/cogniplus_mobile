@@ -41,9 +41,15 @@ class _ToggleBarState extends State<ToggleBar> {
   bool _isSelected = false;
 
   @override
-  Widget build(BuildContext context) {
-    //if(widget.list == null) return Container();
+  void initState() {
     _list = widget.list;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.list == null) _list = [];
+
     return Column(
       children: [
         Expanded(
