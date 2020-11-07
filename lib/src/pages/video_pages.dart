@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cogniplus_mobile/appConfig.dart';
 import 'package:cogniplus_mobile/src/data/data.dart';
 import 'package:cogniplus_mobile/src/model/response_api.dart';
 import 'package:cogniplus_mobile/src/model/send_mail_mixin.dart';
@@ -10,6 +11,7 @@ import 'package:cogniplus_mobile/src/widgets/togglebtn_widget.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -36,6 +38,13 @@ class _VideoPageState extends State<VideoPage> {
   String url = "";
   ConnectivityResult _connectivity;
   Future<Map<String, dynamic>> _response;
+  List<dynamic> _modules;
+  List<dynamic> _videos;
+  int _idSelected = 0;
+  bool _isSelected = false;
+
+  int _selectedModule = 1;
+  dynamic _selectedVideo;
 
   @override
   void initState() {
@@ -162,10 +171,9 @@ class _VideoPageState extends State<VideoPage> {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               final Map<String, dynamic> response = snapshot.data;
-              final List<Map<String, dynamic>> modules =
-                  response['all_visited_modules'];
+              _modules = response['all_visited_modules'];
+              _videos = response["all_viewed_videos"];
 
-              var videos = [v1, v2, v3, v4, v5, v6, v7];
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -174,41 +182,41 @@ class _VideoPageState extends State<VideoPage> {
                     SizedBox(
                       height: 82,
                       width: parentWidth,
-                      child: ToggleBar(
-                          list: modules,
+                      child: _toggleBar(
+                          isModule: true,
+                          list: _modules,
                           padding: 10,
                           diameter: 62,
-                          fieldVisited: "visited",
-                          onSelected: (value) {
-                            print(value.toString());
-                          }),
+                          fieldVisited: "visited"),
                     ),
                     SizedBox(height: 10),
                     SizedBox(
                       height: 200,
                       width: 400,
-                      child: (url == "")
+                      child: (_selectedVideo == null)
                           ? Image.asset("assets/images/default_video.png")
-                          : VideoPlayer(url, UniqueKey()),
+                          : VideoPlayer(
+                              AppConfig.host +
+                                  "/stream/" +
+                                  _selectedVideo["file_name"],
+                              UniqueKey()),
                     ),
                     SizedBox(height: 10),
                     SizedBox(
                       height: 72,
                       width: parentWidth,
                       child: Center(
-                        child: ToggleBar(
-                            list: videos,
+                        child: _toggleBar(
+                            isModule: false,
+                            list: _videos
+                                .where((video) =>
+                                    video["module_id"] == _selectedModule)
+                                .toList(),
                             diameter: 52,
                             padding: 5,
                             background: Colors.grey[700],
                             selectedBackgroundColor: utils.primary,
-                            fieldVisited: "showed",
-                            onSelected: (value) {
-                              setState(() {
-                                print(value);
-                                url = value['url'];
-                              });
-                            }),
+                            fieldVisited: "showed"),
                       ),
                     ),
                   ],
@@ -225,5 +233,64 @@ class _VideoPageState extends State<VideoPage> {
     var response = await Api()
         .getDataFromApi(url: "/senior_videos/" + utils.user.id.toString());
     return json.decode(response.body);
+  }
+
+  Widget _toggleBar(
+      {bool isModule,
+      double padding,
+      double diameter,
+      Color iconColor,
+      Color foreground,
+      Color background,
+      Color selectedforegroundColor,
+      Color selectedBackgroundColor,
+      Color selectedBackground,
+      IconData defaultIcon,
+      List list,
+      String fieldVisited}) {
+    return Column(
+      children: [
+        Expanded(
+            child: Center(
+          child: ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemCount: list.length,
+              itemBuilder: (BuildContext context, int index) {
+                _isSelected = (list[index]['id'] == _idSelected) ? true : false;
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: padding, vertical: padding),
+                  child: ToggleBtn(
+                      diameter: (isModule) ? 64 : 52,
+                      digit: list[index]['id'].toString(),
+                      visited: list[index][fieldVisited],
+                      selectedBackgroundColor: Colors.red,
+                      selectedForegroundColor: Colors.blue,
+                      background:
+                          (isModule) ? const Color(0xff67CABA) : Colors.black38,
+                      foreground: (isModule) ? Colors.black87 : Colors.white,
+                      iconColor: Colors.white,
+                      selected: _isSelected,
+                      onPressed: () {
+                        setState(() {
+                          if (isModule) {
+                            _selectedModule = list[index]['id'];
+                            _selectedVideo = null;
+                          } else {
+                            _selectedVideo = list[index];
+                          }
+
+                          _isSelected = true;
+                          list[index][fieldVisited] = true;
+                          _idSelected = list[index]['id'];
+                        });
+                        print(_idSelected);
+                      }),
+                );
+              }),
+        ))
+      ],
+    );
   }
 }
