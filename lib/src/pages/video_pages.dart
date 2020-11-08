@@ -182,12 +182,7 @@ class _VideoPageState extends State<VideoPage> {
                     SizedBox(
                       height: 82,
                       width: parentWidth,
-                      child: _toggleBar(
-                          isModule: true,
-                          list: _modules,
-                          padding: 10,
-                          diameter: 62,
-                          fieldVisited: "visited"),
+                      child: _toggleBar(list: _modules),
                     ),
                     SizedBox(height: 10),
                     SizedBox(
@@ -206,17 +201,7 @@ class _VideoPageState extends State<VideoPage> {
                       height: 72,
                       width: parentWidth,
                       child: Center(
-                        child: _toggleBar(
-                            isModule: false,
-                            list: _videos
-                                .where((video) =>
-                                    video["module_id"] == _selectedModule)
-                                .toList(),
-                            diameter: 52,
-                            padding: 5,
-                            background: Colors.grey[700],
-                            selectedBackgroundColor: utils.primary,
-                            fieldVisited: "showed"),
+                        child: SizedBox(),
                       ),
                     ),
                   ],
@@ -235,19 +220,7 @@ class _VideoPageState extends State<VideoPage> {
     return json.decode(response.body);
   }
 
-  Widget _toggleBar(
-      {bool isModule,
-      double padding,
-      double diameter,
-      Color iconColor,
-      Color foreground,
-      Color background,
-      Color selectedforegroundColor,
-      Color selectedBackgroundColor,
-      Color selectedBackground,
-      IconData defaultIcon,
-      List list,
-      String fieldVisited}) {
+  Widget _toggleBar({List list}) {
     return Column(
       children: [
         Expanded(
@@ -259,33 +232,26 @@ class _VideoPageState extends State<VideoPage> {
               itemBuilder: (BuildContext context, int index) {
                 _isSelected = (list[index]['id'] == _idSelected) ? true : false;
                 return Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: padding, vertical: padding),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   child: ToggleBtn(
-                      diameter: (isModule) ? 64 : 52,
-                      digit: list[index]['id'].toString(),
-                      visited: list[index][fieldVisited],
+                      diameter: 64,
+                      digit: (index + 1).toString(),
+                      visited: list[index]["visited"],
                       selectedBackgroundColor: Colors.red,
                       selectedForegroundColor: Colors.blue,
-                      background:
-                          (isModule) ? const Color(0xff67CABA) : Colors.black38,
-                      foreground: (isModule) ? Colors.black87 : Colors.white,
+                      background: Color(0xff67CABA),
+                      foreground: Colors.black87,
                       iconColor: Colors.white,
                       selected: _isSelected,
                       onPressed: () {
                         setState(() {
-                          if (isModule) {
-                            _selectedModule = list[index]['id'];
-                            _selectedVideo = null;
-                          } else {
-                            _selectedVideo = list[index];
-                          }
-
                           _isSelected = true;
-                          list[index][fieldVisited] = true;
+                          _selectedModule = list[index]['id'];
                           _idSelected = list[index]['id'];
+
+                          list[index]["visited"] = true;
+                          _selectedVideo = null;
                         });
-                        print(_idSelected);
                       }),
                 );
               }),
