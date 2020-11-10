@@ -4,6 +4,7 @@ import 'package:cogniplus_mobile/appConfig.dart';
 import 'package:cogniplus_mobile/src/data/data.dart';
 import 'package:cogniplus_mobile/src/model/response_api.dart';
 import 'package:cogniplus_mobile/src/model/send_mail_mixin.dart';
+import 'package:cogniplus_mobile/src/pages/cuestionario_pages.dart';
 
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:cogniplus_mobile/src/widgets/togglebar_widget.dart';
@@ -40,8 +41,12 @@ class _VideoPageState extends State<VideoPage> {
   Future<Map<String, dynamic>> _response;
   List<dynamic> _modules;
   List<dynamic> _videos;
-  int _idSelected = 0;
-  bool _isSelected = false;
+
+  int _idSelectedModule = 0;
+  bool _isSelectedModule = false;
+
+  int _idSelectedVideo = 0;
+  bool _isSelectedVideo = false;
 
   int _selectedModule = 1;
   dynamic _selectedVideo;
@@ -182,7 +187,7 @@ class _VideoPageState extends State<VideoPage> {
                     SizedBox(
                       height: 82,
                       width: parentWidth,
-                      child: _toggleBar(list: _modules),
+                      child: _toggleBarModule(list: _modules),
                     ),
                     SizedBox(height: 10),
                     SizedBox(
@@ -201,9 +206,30 @@ class _VideoPageState extends State<VideoPage> {
                       height: 72,
                       width: parentWidth,
                       child: Center(
-                        child: SizedBox(),
+                        child: _toggleBarVideos(
+                            list: _videos
+                                .where((video) =>
+                                    video["module_id"] == _selectedModule)
+                                .toList()),
                       ),
                     ),
+                    SizedBox(height: 10),
+                    RaisedButton(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      child: Text("IR A CUESTIONARIO",
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                      splashColor: Colors.tealAccent,
+                      color: Color(0xff67CABA),
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (BuildContext contex) =>
+                                CuestionarioPage()));
+                      },
+                    )
                   ],
                 ),
               );
@@ -220,7 +246,7 @@ class _VideoPageState extends State<VideoPage> {
     return json.decode(response.body);
   }
 
-  Widget _toggleBar({List list}) {
+  Widget _toggleBarModule({List list}) {
     return Column(
       children: [
         Expanded(
@@ -230,27 +256,69 @@ class _VideoPageState extends State<VideoPage> {
               scrollDirection: Axis.horizontal,
               itemCount: list.length,
               itemBuilder: (BuildContext context, int index) {
-                _isSelected = (list[index]['id'] == _idSelected) ? true : false;
+                _isSelectedModule =
+                    (list[index]['id'] == _idSelectedModule) ? true : false;
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   child: ToggleBtn(
                       diameter: 64,
                       digit: (index + 1).toString(),
                       visited: list[index]["visited"],
-                      selectedBackgroundColor: Colors.red,
-                      selectedForegroundColor: Colors.blue,
+                      selectedBackgroundColor: Color(0xff67CABA),
+                      selectedForegroundColor: Colors.black87,
                       background: Color(0xff67CABA),
-                      foreground: Colors.black87,
+                      foreground: Colors.white,
                       iconColor: Colors.white,
-                      selected: _isSelected,
+                      selected: _isSelectedModule,
                       onPressed: () {
                         setState(() {
-                          _isSelected = true;
+                          _isSelectedModule = true;
                           _selectedModule = list[index]['id'];
-                          _idSelected = list[index]['id'];
+                          _idSelectedModule = list[index]['id'];
 
                           list[index]["visited"] = true;
                           _selectedVideo = null;
+                        });
+                      }),
+                );
+              }),
+        ))
+      ],
+    );
+  }
+
+  Widget _toggleBarVideos({List list}) {
+    return Column(
+      children: [
+        Expanded(
+            child: Center(
+          child: ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemCount: list.length,
+              itemBuilder: (BuildContext context, int index) {
+                _isSelectedVideo =
+                    (list[index]['id'] == _idSelectedVideo) ? true : false;
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+                  child: ToggleBtn(
+                      diameter: 52,
+                      digit: (index + 1).toString(),
+                      visited: list[index]["showed"],
+                      selectedBackgroundColor: Color(0xff67CABA),
+                      selectedForegroundColor: Colors.black87,
+                      background: Colors.black54,
+                      foreground: Colors.white,
+                      iconColor: Colors.white,
+                      selected: _isSelectedVideo,
+                      onPressed: () {
+                        setState(() {
+                          _isSelectedVideo = true;
+                          _selectedVideo = list[index]['id'];
+                          _idSelectedVideo = list[index]['id'];
+
+                          list[index]["showed"] = true;
+                          _selectedVideo = list[index];
                         });
                       }),
                 );
