@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/pages/form_adulto_pages.dart';
+import 'package:cogniplus_mobile/src/pages/video_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:cogniplus_mobile/src/providers/db_provider.dart';
 import 'package:connectivity/connectivity.dart';
@@ -129,11 +130,12 @@ class _HomePageState extends State<HomePage> {
                         onPressed: () {
                           //SystemSound.play(SystemSoundType.click);
 
-                          // Navigator.of(context).push(MaterialPageRoute(
-                          //     builder: (BuildContext context) =>
-                          //         FormAdultoPage(adulto: list[index])));
-                          Navigator.of(context)
-                              .pushNamed('video', arguments: list[index].id);
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  VideoPage(adulto: list[index])));
+
+                          // Navigator.of(context)
+                          //     .pushNamed('video', arguments: list[index].id);
                         }),
                   ),
                 ),

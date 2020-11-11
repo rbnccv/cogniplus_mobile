@@ -6,6 +6,9 @@ import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 
 class CuestionarioPage extends StatefulWidget {
+  final AdultoModel adulto;
+
+  const CuestionarioPage({Key key, this.adulto}) : super(key: key);
   @override
   _CuestionarioPageState createState() => _CuestionarioPageState();
 }
@@ -34,8 +37,7 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
                   onPressed: () {}),
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context)
-                      .pushReplacementNamed('home');
+                  Navigator.of(context).pushReplacementNamed('home');
                 },
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,8 +104,7 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
     return Center(
       child: SmoothStarRating(
           allowHalfRating: false,
-          onRated: (value) =>
-              setState(() => _response1 = value.toInt()),
+          onRated: (value) => setState(() => _response1 = value.toInt()),
           starCount: 5,
           rating: _response1.toDouble(),
           size: 40,
@@ -117,8 +118,7 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
     return Center(
       child: SmoothStarRating(
           allowHalfRating: false,
-          onRated: (value) =>
-              setState(() => _response2 = value.toInt()),
+          onRated: (value) => setState(() => _response2 = value.toInt()),
           starCount: 5,
           rating: _response2.toDouble(),
           size: 40,

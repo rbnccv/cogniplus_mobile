@@ -29,6 +29,10 @@ import 'package:cogniplus_mobile/src/model/response_api.dart';
 //Text('headline', style: Theme.of(context).textTheme.headline,),
 
 class VideoPage extends StatefulWidget {
+  final AdultoModel adulto;
+
+  const VideoPage({Key key, this.adulto}) : super(key: key);
+
   @override
   _VideoPageState createState() => _VideoPageState();
 }
@@ -39,6 +43,7 @@ class _VideoPageState extends State<VideoPage> {
   String url = "";
   ConnectivityResult _connectivity;
   Future<Map<String, dynamic>> _response;
+
   List<dynamic> _modules;
   List<dynamic> _videos;
 
@@ -176,6 +181,7 @@ class _VideoPageState extends State<VideoPage> {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               final Map<String, dynamic> response = snapshot.data;
+
               _modules = response['all_visited_modules'];
               _videos = response["all_viewed_videos"];
 
@@ -224,11 +230,11 @@ class _VideoPageState extends State<VideoPage> {
                               fontWeight: FontWeight.bold)),
                       splashColor: Colors.tealAccent,
                       color: Color(0xff67CABA),
-                      onPressed: () {
-                        _sendInfo();
-                        // Navigator.of(context).push(MaterialPageRoute(
-                        //     builder: (BuildContext contex) =>
-                        //         CuestionarioPage()));
+                      onPressed: () async {
+                        await _sendInfo();
+                        await Navigator.of(context).push(MaterialPageRoute(
+                            builder: (BuildContext contex) =>
+                                CuestionarioPage()));
                       },
                     )
                   ],
@@ -247,9 +253,17 @@ class _VideoPageState extends State<VideoPage> {
     return json.decode(response.body);
   }
 
-  _sendInfo() {
-    print(_videos);
-    print(_modules);
+  Future<Map<String, dynamic>> _sendInfo() async {
+    var info = {
+      "senior": widget.adulto,
+      "modules": _modules,
+      "videos": _videos
+    };
+
+    var response = await Api().setPostDataFromApi(
+        url: '/senior_videos/' + utils.user.id.toString(), data: info);
+    print(response.body.toString());
+    return json.decode(response.body);
   }
 
   Widget _toggleBarModule({List list}) {
