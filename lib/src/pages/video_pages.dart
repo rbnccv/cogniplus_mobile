@@ -63,7 +63,7 @@ class _VideoPageState extends State<VideoPage> {
   }
 
   _setInit() async {
-    _response = _getResponse();
+    _response = _getRequest();
     _connectivity = await Connectivity().checkConnectivity();
   }
 
@@ -213,7 +213,7 @@ class _VideoPageState extends State<VideoPage> {
                                 .toList()),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 30),
                     RaisedButton(
                       padding:
                           EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -225,9 +225,10 @@ class _VideoPageState extends State<VideoPage> {
                       splashColor: Colors.tealAccent,
                       color: Color(0xff67CABA),
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (BuildContext contex) =>
-                                CuestionarioPage()));
+                        _sendInfo();
+                        // Navigator.of(context).push(MaterialPageRoute(
+                        //     builder: (BuildContext contex) =>
+                        //         CuestionarioPage()));
                       },
                     )
                   ],
@@ -240,10 +241,15 @@ class _VideoPageState extends State<VideoPage> {
         });
   }
 
-  Future<Map<String, dynamic>> _getResponse() async {
+  Future<Map<String, dynamic>> _getRequest() async {
     var response = await Api()
         .getDataFromApi(url: "/senior_videos/" + utils.user.id.toString());
     return json.decode(response.body);
+  }
+
+  _sendInfo() {
+    print(_videos);
+    print(_modules);
   }
 
   Widget _toggleBarModule({List list}) {
