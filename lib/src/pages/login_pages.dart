@@ -143,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
               }),
           SizedBox(height: 20, width: 0),
           InputText(
-              value: "password",
+              value: "Ruben_4U",
               hint: "Contraseña.",
               onSaved: (value) => _password = value,
               isSecure: true,

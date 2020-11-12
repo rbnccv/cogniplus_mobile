@@ -109,8 +109,8 @@ class _VideoPageState extends State<VideoPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text('AdultoMayor', style: utils.estBodyAccent16),
-                    Text('nombre apellido', style: utils.estBodyAccent19),
+                    Text(widget.adulto.nombres, style: utils.estBodyAccent16),
+                    Text(widget.adulto.apellidos, style: utils.estBodyAccent19),
                   ],
                 ),
               ],
@@ -185,6 +185,12 @@ class _VideoPageState extends State<VideoPage> {
               _modules = response['all_visited_modules'];
               _videos = response["all_viewed_videos"];
 
+              if (!_modules[0]['visited']) {
+                _modules[0]['visited'] = true;
+                _selectedModule = 1;
+                _idSelectedModule = 1;
+              }
+
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -230,12 +236,15 @@ class _VideoPageState extends State<VideoPage> {
                               fontWeight: FontWeight.bold)),
                       splashColor: Colors.tealAccent,
                       color: Color(0xff67CABA),
-                      onPressed: () async {
-                        await _sendInfo();
-                        await Navigator.of(context).push(MaterialPageRoute(
-                            builder: (BuildContext contex) =>
-                                CuestionarioPage()));
-                      },
+                      onPressed: (_selectedVideo != null)
+                          ? () async {
+                              await _sendInfoAndGotTo();
+                              // await Navigator.of(context).push(
+                              //     MaterialPageRoute(
+                              //         builder: (BuildContext contex) =>
+                              //             CuestionarioPage()));
+                            }
+                          : null,
                     )
                   ],
                 ),
@@ -249,19 +258,18 @@ class _VideoPageState extends State<VideoPage> {
 
   Future<Map<String, dynamic>> _getRequest() async {
     var response = await Api()
-        .getDataFromApi(url: "/senior_videos/" + utils.user.id.toString());
+        .getDataFromApi(url: "/senior_videos/" + widget.adulto.id.toString());
     return json.decode(response.body);
   }
 
-  Future<Map<String, dynamic>> _sendInfo() async {
+  Future<Map<String, dynamic>> _sendInfoAndGotTo() async {
     var info = {
       "senior": widget.adulto,
       "modules": _modules,
       "videos": _videos
     };
-
     var response = await Api().setPostDataFromApi(
-        url: '/senior_videos/' + utils.user.id.toString(), data: info);
+        url: '/senior_videos/' + widget.adulto.id.toString(), data: info);
     print(response.body.toString());
     return json.decode(response.body);
   }
