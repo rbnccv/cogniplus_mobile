@@ -45,8 +45,8 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text('AdultoMayor', style: utils.estBodyAccent16),
-                        Text('${_adulto.nombres} ${_adulto.apellidos}',
+                        Text('${_adulto.nombres}', style: utils.estBodyAccent16),
+                        Text('${_adulto.apellidos}',
                             style: utils.estBodyAccent19),
                       ],
                     ),
