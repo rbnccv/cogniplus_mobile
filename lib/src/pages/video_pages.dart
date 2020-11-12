@@ -5,6 +5,7 @@ import 'package:cogniplus_mobile/src/data/data.dart';
 import 'package:cogniplus_mobile/src/model/response_api.dart';
 import 'package:cogniplus_mobile/src/model/send_mail_mixin.dart';
 import 'package:cogniplus_mobile/src/pages/cuestionario_pages.dart';
+import 'package:cogniplus_mobile/src/pages/video_pages%20copy%203.dart';
 
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:cogniplus_mobile/src/widgets/togglebar_widget.dart';
@@ -25,6 +26,8 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:cogniplus_mobile/src/widgets/videp_player_widget.dart';
 import 'package:cogniplus_mobile/src/model/response_api.dart';
+import 'package:video_player/video_player.dart';
+import 'package:cogniplus_mobile/src/widgets/videp_player_widget.dart';
 
 //Text('headline', style: Theme.of(context).textTheme.headline,),
 
@@ -39,6 +42,9 @@ class VideoPage extends StatefulWidget {
 
 class _VideoPageState extends State<VideoPage> {
   BuildContext navigatorKey;
+
+  VideoPlayerController _videoPlayerController;
+
   bool _dialVisible = true;
   String url = "";
   ConnectivityResult _connectivity;
@@ -64,6 +70,7 @@ class _VideoPageState extends State<VideoPage> {
 
   @override
   void dispose() {
+    this._videoPlayerController?.dispose();
     super.dispose();
   }
 
@@ -205,13 +212,7 @@ class _VideoPageState extends State<VideoPage> {
                     SizedBox(
                       height: 200,
                       width: 400,
-                      child: (_selectedVideo == null)
-                          ? Image.asset("assets/images/default_video.png")
-                          : VideoPlayer(
-                              AppConfig.host +
-                                  "/stream/" +
-                                  _selectedVideo["file_name"],
-                              UniqueKey()),
+                      child: _setVideoPlayer(),
                     ),
                     SizedBox(height: 10),
                     SizedBox(
@@ -237,12 +238,8 @@ class _VideoPageState extends State<VideoPage> {
                       splashColor: Colors.tealAccent,
                       color: Color(0xff67CABA),
                       onPressed: (_selectedVideo != null)
-                          ? () async {
-                              await _sendInfoAndGotTo();
-                              // await Navigator.of(context).push(
-                              //     MaterialPageRoute(
-                              //         builder: (BuildContext contex) =>
-                              //             CuestionarioPage()));
+                          ? () {
+                              _sendInfoAndGotTo();
                             }
                           : null,
                     )
@@ -262,16 +259,22 @@ class _VideoPageState extends State<VideoPage> {
     return json.decode(response.body);
   }
 
-  Future<Map<String, dynamic>> _sendInfoAndGotTo() async {
+  _sendInfoAndGotTo() async {
     var info = {
       "senior": widget.adulto,
       "modules": _modules,
       "videos": _videos
     };
-    var response = await Api().setPostDataFromApi(
+    await Api().setPostDataFromApi(
         url: '/senior_videos/' + widget.adulto.id.toString(), data: info);
-    print(response.body.toString());
-    return json.decode(response.body);
+    _videoPlayerController.pause();
+
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext contex) => CuestionarioPage(info: {
+              'adulto': widget.adulto,
+              'idModulo': _idSelectedModule,
+              'idVideo': _idSelectedVideo
+            })));
   }
 
   Widget _toggleBarModule({List list}) {
@@ -354,5 +357,17 @@ class _VideoPageState extends State<VideoPage> {
         ))
       ],
     );
+  }
+
+  Widget _setVideoPlayer() {
+    if (_selectedVideo == null) {
+      return Image.asset("assets/images/default_video.png");
+    } else {
+      _videoPlayerController = VideoPlayerController.network(
+          AppConfig.host + "/stream/" + _selectedVideo["file_name"]);
+
+      return Video_player(
+          videocontroller: _videoPlayerController, newKey: UniqueKey());
+    }
   }
 }

@@ -2,30 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
-class VideoPlayer extends StatefulWidget {
-  final String videoUrl;
+class Video_player extends StatefulWidget {
+  final VideoPlayerController videocontroller;
   final UniqueKey newKey;
 
-  VideoPlayer(this.videoUrl, this.newKey) : super(key: newKey);
+  Video_player({this.videocontroller, this.newKey}) : super(key: newKey);
 
   @override
-  _VideoPlayerState createState() => _VideoPlayerState();
+  _Video_playerState createState() => _Video_playerState();
 }
 
-class _VideoPlayerState extends State<VideoPlayer> {
-  VideoPlayerController _videoPlayerController;
+class _Video_playerState extends State<Video_player> {
   ChewieController _chewieController;
 
   @override
   void initState() {
-    this._initControllers(this.widget.videoUrl);
+    this._initControllers(widget.videocontroller);
     super.initState();
   }
 
-  void _initControllers(String url) {
-    this._videoPlayerController = VideoPlayerController.network(url);
+  void _initControllers(VideoPlayerController video) {
     this._chewieController = ChewieController(
-        videoPlayerController: this._videoPlayerController,
+        videoPlayerController: widget.videocontroller,
         autoInitialize: true,
         looping: false,
         showControls: true,
@@ -42,7 +40,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   void dispose() {
-    this._videoPlayerController?.dispose();
+    this.widget.videocontroller?.dispose();
     this._chewieController?.dispose();
     super.dispose();
   }

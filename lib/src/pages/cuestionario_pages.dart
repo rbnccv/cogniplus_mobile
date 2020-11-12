@@ -6,9 +6,9 @@ import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 
 class CuestionarioPage extends StatefulWidget {
-  final AdultoModel adulto;
+  final Map<String, dynamic> info;
 
-  const CuestionarioPage({Key key, this.adulto}) : super(key: key);
+  const CuestionarioPage({Key key, this.info}) : super(key: key);
   @override
   _CuestionarioPageState createState() => _CuestionarioPageState();
 }
@@ -17,14 +17,11 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
   AdultoModel _adulto;
   int _idVideo;
   int _idModulo;
-  int _idHistorial;
   @override
   Widget build(BuildContext context) {
-    final List data = ModalRoute.of(context).settings.arguments;
-    _adulto = data[0];
-    _idModulo = data[1];
-    _idVideo = data[2];
-    _idHistorial = data[3];
+    _adulto = widget.info['adulto'];
+    _idModulo = widget.info['idModulo'];
+    _idVideo = widget.info['idVideo'];
     //VideoModel video = VideoModel(id: data[1], idModulo: data[2]);
     return Scaffold(
         appBar: AppBar(
@@ -169,16 +166,14 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
                           fontSize: 18,
                           fontWeight: FontWeight.bold)))),
           onPressed: () {
-            if (_response1 <= 0 || _response2 <= 0 || _idHistorial == null)
-              return null;
+            if (_response1 <= 0 || _response2 <= 0) return null;
             Navigator.of(context).pushReplacementNamed('evaluacion',
                 arguments: [
                   adulto,
                   _response1,
                   _response2,
                   _idModulo,
-                  _idVideo,
-                  _idHistorial
+                  _idVideo
                 ]);
           },
         )
