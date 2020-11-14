@@ -5,7 +5,6 @@ import 'package:cogniplus_mobile/src/data/data.dart';
 import 'package:cogniplus_mobile/src/model/response_api.dart';
 import 'package:cogniplus_mobile/src/model/send_mail_mixin.dart';
 import 'package:cogniplus_mobile/src/pages/cuestionario_pages.dart';
-import 'package:cogniplus_mobile/src/pages/video_pages%20copy%203.dart';
 
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:cogniplus_mobile/src/widgets/togglebar_widget.dart';

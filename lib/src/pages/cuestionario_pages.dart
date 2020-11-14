@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
+import 'package:cogniplus_mobile/src/providers/api.dart';
+import 'package:connectivity/connectivity.dart';
 //import 'package:cogniplus/src/model/video_model.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -17,6 +21,20 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
   AdultoModel _adulto;
   int _idVideo;
   int _idModulo;
+  var _response;
+  ConnectivityResult _connectivity;
+
+  @override
+  void initState() {
+    _setInit();
+    super.initState();
+  }
+
+  _setInit() async {
+    _response = _getRequest();
+    _connectivity = await Connectivity().checkConnectivity();
+  }
+
   @override
   Widget build(BuildContext context) {
     _adulto = widget.info['adulto'];
@@ -45,7 +63,8 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text('${_adulto.nombres}', style: utils.estBodyAccent16),
+                        Text('${_adulto.nombres}',
+                            style: utils.estBodyAccent16),
                         Text('${_adulto.apellidos}',
                             style: utils.estBodyAccent19),
                       ],
@@ -123,6 +142,15 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
           borderColor: Theme.of(context).primaryColor,
           spacing: 0.0),
     );
+  }
+
+  Future<List<dynamic>> _getRequest() async {
+    var response = await Api().getDataFromApi(url: '/questions');
+    return json.decode(response.body);
+  }
+
+  Widget _makeQuestionsWidgets(BuildContext context) {
+    return Text("");
   }
 
   Widget _getBotones(BuildContext context, AdultoModel adulto) {
