@@ -80,68 +80,63 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
         ),
         body: SafeArea(
             child: SingleChildScrollView(
-          physics: ScrollPhysics(),
           child: _getBody(context, _adulto),
         )));
   }
 
   Widget _getBody(BuildContext context, AdultoModel adulto) {
-    return FutureBuilder(
-      future: _response,
-      builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
-        }
-        List<dynamic> questions = snapshot.data;
-        int length = questions.length;
-        return Container(
-          padding: EdgeInsets.fromLTRB(80, 20, 80, 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                "PREGUNTAS",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 35),
-              ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: length,
-                  itemBuilder: (contex, index) {
-                    return Column(
-                      children: [
-                        Text(
-                          "${questions[index]['question_text']}",
-                          style: TextStyle(fontSize: 18),
-                          textAlign: TextAlign.center,
-                        ),
-                        _starsQuestion(context,
-                            double.parse(questions[index]['assessment'])),
-                        SizedBox(height: (index == (length - 1)) ? 35 : 15),
-                      ],
-                    );
-                  }),
-              _getBotones(context),
-            ],
-          ),
-        );
-      },
-    );
+    return Container(
+        padding: EdgeInsets.fromLTRB(80.0, 20.0, 80.0, 30.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Text('PREGUNTAS',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            SizedBox(height: 15),
+            Text(
+              '¿El adulto mayor se muestra predispuesto/a  realizar el ejercicio?',
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 10),
+            _starsQuestion1(context),
+            Text(
+              '¿Ejecuta el ejercicio sin problemas?',
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 10),
+            _starsQuestion2(context),
+            SizedBox(height: 20),
+            _getBotones(context, adulto),
+          ],
+        ));
   }
 
-  Widget _starsQuestion(BuildContext context, double assessment) {
+  int _response1 = 0;
+  int _response2 = 0;
+
+  Widget _starsQuestion1(BuildContext context) {
     return Center(
       child: SmoothStarRating(
           allowHalfRating: false,
-          onRated: (value) {
-            setState(() {
-              
-            });
-          },
+          onRated: (value) => setState(() => _response1 = value.toInt()),
           starCount: 5,
-          rating: assessment,
+          rating: _response1.toDouble(),
+          size: 40,
+          color: Theme.of(context).primaryColor,
+          borderColor: Theme.of(context).primaryColor,
+          spacing: 0.0),
+    );
+  }
+
+  Widget _starsQuestion2(BuildContext context) {
+    return Center(
+      child: SmoothStarRating(
+          allowHalfRating: false,
+          onRated: (value) => setState(() => _response2 = value.toInt()),
+          starCount: 5,
+          rating: _response2.toDouble(),
           size: 40,
           color: Theme.of(context).primaryColor,
           borderColor: Theme.of(context).primaryColor,
@@ -158,7 +153,7 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
     return Text("");
   }
 
-  Widget _getBotones(BuildContext context) {
+  Widget _getBotones(BuildContext context, AdultoModel adulto) {
     bool isLandscape =
         (MediaQuery.of(context).orientation == Orientation.landscape);
     return Flex(
@@ -198,7 +193,17 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold)))),
-          onPressed: () {},
+          onPressed: () {
+            if (_response1 <= 0 || _response2 <= 0) return null;
+            Navigator.of(context).pushReplacementNamed('evaluacion',
+                arguments: [
+                  adulto,
+                  _response1,
+                  _response2,
+                  _idModulo,
+                  _idVideo
+                ]);
+          },
         )
       ],
     );

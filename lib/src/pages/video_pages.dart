@@ -264,6 +264,7 @@ class _VideoPageState extends State<VideoPage> {
       "modules": _modules,
       "videos": _videos
     };
+
     await Api().setPostDataFromApi(
         url: '/senior_videos/' + widget.adulto.id.toString(), data: info);
     _videoPlayerController.pause();
