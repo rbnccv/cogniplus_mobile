@@ -21,8 +21,10 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
   AdultoModel _adulto;
   int _idVideo;
   int _idModulo;
-  var _response;
+  Future<List<dynamic>> _response;
   ConnectivityResult _connectivity;
+
+  List<dynamic> _questions = [];
 
   @override
   void initState() {
@@ -94,8 +96,8 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
         } else if (!snapshot.hasData) {
           return Center(child: CircularProgressIndicator());
         }
-        List<dynamic> questions = snapshot.data;
-        int length = questions.length;
+        _questions = snapshot.data;
+        int length = _questions.length;
         return Container(
           padding: EdgeInsets.fromLTRB(80, 20, 80, 30),
           child: Column(
@@ -113,12 +115,11 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
                     return Column(
                       children: [
                         Text(
-                          "${questions[index]['question_text']}",
+                          "${_questions[index]['question_text']}",
                           style: TextStyle(fontSize: 18),
                           textAlign: TextAlign.center,
                         ),
-                        _starsQuestion(context,
-                            double.parse(questions[index]['assessment'])),
+                        _starsQuestion(context, index),
                         SizedBox(height: (index == (length - 1)) ? 35 : 15),
                       ],
                     );
@@ -131,17 +132,17 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
     );
   }
 
-  Widget _starsQuestion(BuildContext context, double assessment) {
+  Widget _starsQuestion(BuildContext context, int id) {
     return Center(
       child: SmoothStarRating(
           allowHalfRating: false,
           onRated: (value) {
             setState(() {
-              
+              _questions[id]["assessment"] = value;
             });
           },
           starCount: 5,
-          rating: assessment,
+          rating: 0.0,
           size: 40,
           color: Theme.of(context).primaryColor,
           borderColor: Theme.of(context).primaryColor,
@@ -152,10 +153,6 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
   Future<List<dynamic>> _getRequest() async {
     var response = await Api().getDataFromApi(url: '/questions');
     return json.decode(response.body);
-  }
-
-  Widget _makeQuestionsWidgets(BuildContext context) {
-    return Text("");
   }
 
   Widget _getBotones(BuildContext context) {
@@ -186,20 +183,29 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
                 height: 10.0,
               ),
         FlatButton(
-          color: Theme.of(context).primaryColor,
-          child: SizedBox(
-              width: (isLandscape) ? 150 : double.infinity,
-              height: 50,
-              child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 14, 10, 0),
-                  child: Text('SIGUIENTE',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold)))),
-          onPressed: () {},
-        )
+            color: Theme.of(context).primaryColor,
+            child: SizedBox(
+                width: (isLandscape) ? 150 : double.infinity,
+                height: 50,
+                child: Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 14, 10, 0),
+                    child: Text('SIGUIENTE',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)))),
+            onPressed: () async {
+              Map<String, dynamic> item = {
+                "user_id": utils.user.id,
+                "senior_id": _adulto.id,
+                "results": _questions,
+              };
+              var response = await Api()
+                  .setPostDataFromApi(url: '/question_video', data: item);
+
+              print(response.body);
+            }),
       ],
     );
   }
