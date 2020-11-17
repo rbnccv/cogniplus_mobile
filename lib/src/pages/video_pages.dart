@@ -52,7 +52,7 @@ class _VideoPageState extends State<VideoPage> {
   List<dynamic> _modules;
   List<dynamic> _videos;
 
-  int _idSelectedModule = 0;
+  int _idSelectedModule = 1;
   bool _isSelectedModule = false;
 
   int _idSelectedVideo = 0;

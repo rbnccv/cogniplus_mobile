@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
+import 'package:cogniplus_mobile/src/pages/evaluacion_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:connectivity/connectivity.dart';
 //import 'package:cogniplus/src/model/video_model.dart';
@@ -25,7 +26,6 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
   ConnectivityResult _connectivity;
 
   List<dynamic> _questions = [];
-
   @override
   void initState() {
     _setInit();
@@ -34,14 +34,15 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
 
   _setInit() async {
     _response = _getRequest();
-    _connectivity = await Connectivity().checkConnectivity();
+    _adulto = widget.info['adulto'];
+    _idModulo = widget.info['idModulo'];
+    _idVideo = widget.info['idVideo'];
+    _connectivity = await Connectivity().checkConnectivity();    
   }
 
   @override
   Widget build(BuildContext context) {
-    _adulto = widget.info['adulto'];
-    _idModulo = widget.info['idModulo'];
-    _idVideo = widget.info['idVideo'];
+    
     //VideoModel video = VideoModel(id: data[1], idModulo: data[2]);
     return Scaffold(
         appBar: AppBar(
@@ -201,10 +202,20 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
                 "senior_id": _adulto.id,
                 "results": _questions,
               };
-              var response = await Api()
+              final response = await Api()
                   .setPostDataFromApi(url: '/question_video', data: item);
 
-              print(response.body);
+              if (response.statusCode == 200) {
+                var body = json.decode(response.body);
+                print(body.toString());
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => EvaluacionPage(info: {
+                          "adulto": this._adulto,
+                          "idModulo": _idModulo,
+                          "idVideo": _idVideo,
+                          "response": body,
+                        })));
+              }
             }),
       ],
     );
