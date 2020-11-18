@@ -23,8 +23,10 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
   int _idModulo;
   int _idVideo;
   Map<String, dynamic> _response;
+  List<dynamic> _questions;
   ConnectivityResult _connectivity;
   final _editController = TextEditingController();
+
   bool _isButtonDisabled;
 
   @override
@@ -39,6 +41,8 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
     _idModulo = widget.info["idModulo"];
     _idVideo = widget.info["idVideo"];
     _response = widget.info["response"];
+    _questions = _response["results"];
+
     _connectivity = await Connectivity().checkConnectivity();
   }
 
@@ -66,8 +70,9 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text('AdultoMayor', style: utils.estBodyAccent16),
-                        Text('${_adulto.nombres} ${_adulto.apellidos}',
+                        Text('${_adulto.nombres}',
+                            style: utils.estBodyAccent16),
+                        Text('${_adulto.apellidos}',
                             style: utils.estBodyAccent19),
                       ],
                     ),
@@ -88,58 +93,69 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
 
   Widget _getBody(BuildContext context) {
     final TextStyle font1 = TextStyle(fontSize: 16);
+    int length = _questions.length;
     return Container(
-        padding: EdgeInsets.fromLTRB(60.0, 30.0, 60.0, 30.0),
+        padding: EdgeInsets.fromLTRB(60.0, 10.0, 60.0, 30.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            SizedBox(height: 20),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          '${_questions[index]["question_text"].toString()}',
+                          style: font1,
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          children: [
+                            _starsQuestion(
+                                context, _questions[index]["assessment"]),
+                            Expanded(child: SizedBox()),
+                            Text(_questions[index]["assessment"].toString() +
+                                ((_questions[index]["assessment"] <= 1)
+                                    ? " estrella"
+                                    : " estrellas")),
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                      ]),
+                );
+              },
+            ),
+            SizedBox(height: 20),
             Text(
-                '¿El adulto mayor se muestra predispuesto/a  realizar el ejercicio?',
-                style: font1),
-            Row(
-              children: <Widget>[
-                Expanded(child: SizedBox()),
-              ],
-            ),
-            Text('¿Ejecuta el ejercicio sin problemas?', style: font1),
-            Row(
-              children: <Widget>[
-                Expanded(child: SizedBox()),
-              ],
-            ),
-            Text('Promedio', style: font1),
-            Row(
-              children: <Widget>[
-                Expanded(child: SizedBox()),
-              ],
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Evaluación profesional:',
+              "Evaluación profesional: ",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             Container(
-                width: double.infinity,
-                child: TextField(
-                    controller: _editController,
-                    keyboardType: TextInputType.text,
-                    minLines: 8,
-                    maxLines: 10,
-                    maxLengthEnforced: true,
-                    textInputAction: TextInputAction.newline,
-                    style: TextStyle(fontSize: 14),
-                    decoration: InputDecoration(
-                        hintText: 'Añadir Comentario...',
-                        fillColor: Colors.white,
-                        filled: true,
-                        contentPadding: EdgeInsets.all(10.0),
-                        border: InputBorder.none,
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(5.0)),
-                            borderSide: BorderSide(color: Colors.black))))),
-            SizedBox(height: 20),
+              width: double.infinity,
+              child: TextField(
+                  controller: _editController,
+                  keyboardType: TextInputType.multiline,
+                  minLines: 6,
+                  maxLines: 10,
+                  maxLengthEnforced: true,
+                  textInputAction: TextInputAction.newline,
+                  style: TextStyle(fontSize: 14),
+                  decoration: InputDecoration(
+                      hintText: 'Añadir Comentario...',
+                      fillColor: Colors.white,
+                      filled: true,
+                      contentPadding: EdgeInsets.all(10.0),
+                      border: InputBorder.none,
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                          borderSide: BorderSide(color: Colors.black)))),
+            ),
+            SizedBox(height: 30),
             _getBotones(context),
           ],
         ));
@@ -207,6 +223,18 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
 
       _showSnack('Mensaje no enviado', e?.toString(), context);
     }
+  }
+
+  Widget _starsQuestion(BuildContext context, int rating) {
+    return SmoothStarRating(
+        allowHalfRating: false,
+        isReadOnly: true,
+        starCount: 5,
+        rating: rating.toDouble(),
+        size: 25,
+        color: Theme.of(context).primaryColor,
+        borderColor: Theme.of(context).primaryColor,
+        spacing: 0.0);
   }
 
   void _showSnack(String title, String message, BuildContext context) {

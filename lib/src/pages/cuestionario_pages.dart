@@ -37,12 +37,11 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
     _adulto = widget.info['adulto'];
     _idModulo = widget.info['idModulo'];
     _idVideo = widget.info['idVideo'];
-    _connectivity = await Connectivity().checkConnectivity();    
+    _connectivity = await Connectivity().checkConnectivity();
   }
 
   @override
   Widget build(BuildContext context) {
-    
     //VideoModel video = VideoModel(id: data[1], idModulo: data[2]);
     return Scaffold(
         appBar: AppBar(
@@ -207,7 +206,13 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
 
               if (response.statusCode == 200) {
                 var body = json.decode(response.body);
-                print(body.toString());
+                print({
+                  "adulto": this._adulto,
+                  "idModulo": _idModulo,
+                  "idVideo": _idVideo,
+                  "response": body,
+                }.toString());
+
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => EvaluacionPage(info: {
                           "adulto": this._adulto,
