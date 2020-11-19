@@ -1,3 +1,4 @@
+import 'package:cogniplus_mobile/src/pages/cuestionario_pages.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -109,7 +110,7 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          '${_questions[index]["question_text"].toString()}',
+                          '${_questions[index]["question_text"]}',
                           style: font1,
                         ),
                         SizedBox(height: 10),
@@ -181,7 +182,16 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
                             color: Colors.white,
                             fontSize: 15,
                             fontWeight: FontWeight.bold)))),
-            onPressed: () {}),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (BuildContext context) => CuestionarioPage(
+                        info: {
+                          'adulto': _adulto,
+                          'idModulo': _idModulo,
+                          'idVideo': _idVideo
+                        },
+                      )));
+            }),
         (isLandscape)
             ? SizedBox()
             : SizedBox(

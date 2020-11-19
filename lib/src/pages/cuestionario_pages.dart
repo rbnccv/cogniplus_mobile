@@ -38,6 +38,7 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
     _idModulo = widget.info['idModulo'];
     _idVideo = widget.info['idVideo'];
     _connectivity = await Connectivity().checkConnectivity();
+
   }
 
   @override
@@ -98,6 +99,11 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
         }
         _questions = snapshot.data;
         int length = _questions.length;
+
+        _questions.forEach((question) {
+          question["assessment"] = 0.0;
+        });
+
         return Container(
           padding: EdgeInsets.fromLTRB(80, 20, 80, 30),
           child: Column(
@@ -196,22 +202,21 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
                             fontSize: 18,
                             fontWeight: FontWeight.bold)))),
             onPressed: () async {
+              if (!_isQualified()) {
+                return;
+              }
+
               Map<String, dynamic> item = {
                 "user_id": utils.user.id,
                 "senior_id": _adulto.id,
                 "results": _questions,
               };
+
               final response = await Api()
                   .setPostDataFromApi(url: '/question_video', data: item);
 
               if (response.statusCode == 200) {
                 var body = json.decode(response.body);
-                print({
-                  "adulto": this._adulto,
-                  "idModulo": _idModulo,
-                  "idVideo": _idVideo,
-                  "response": body,
-                }.toString());
 
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => EvaluacionPage(info: {
@@ -224,5 +229,16 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
             }),
       ],
     );
+  }
+
+  bool _isQualified() {
+    bool isQualified = true;
+    for (int i = 0; i < _questions.length; i++) {
+      if (double.parse(_questions[i]["assessment"]) <= 0) {
+        isQualified = false;
+        break;
+      }
+    }
+    return isQualified;
   }
 }
