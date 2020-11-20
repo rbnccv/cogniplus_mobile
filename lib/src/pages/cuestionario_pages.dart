@@ -4,6 +4,7 @@ import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/pages/evaluacion_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:flushbar/flushbar.dart';
 //import 'package:cogniplus/src/model/video_model.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -39,6 +40,11 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
     _idVideo = widget.info['idVideo'];
     _connectivity = await Connectivity().checkConnectivity();
 
+    _questions = await _response;
+
+    _questions.forEach((question) {
+      question["assessment"] = 0;
+    });
   }
 
   @override
@@ -98,12 +104,8 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
           return Center(child: CircularProgressIndicator());
         }
         _questions = snapshot.data;
+
         int length = _questions.length;
-
-        _questions.forEach((question) {
-          question["assessment"] = 0.0;
-        });
-
         return Container(
           padding: EdgeInsets.fromLTRB(80, 20, 80, 30),
           child: Column(
@@ -203,6 +205,10 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
                             fontWeight: FontWeight.bold)))),
             onPressed: () async {
               if (!_isQualified()) {
+                _showSnack(
+                    "Atención",
+                    "Debe ingresar una valoración para cada una de las preguntas.",
+                    context);
                 return;
               }
 
@@ -234,11 +240,35 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
   bool _isQualified() {
     bool isQualified = true;
     for (int i = 0; i < _questions.length; i++) {
-      if (double.parse(_questions[i]["assessment"]) <= 0) {
+      if (_questions[i]["assessment"] <= 0) {
         isQualified = false;
         break;
       }
     }
     return isQualified;
+  }
+
+  void _showSnack(String title, String message, BuildContext context) {
+    Flushbar flush;
+
+    flush = Flushbar<bool>(
+      backgroundColor: utils.accent,
+      //showProgressIndicator: true,
+      title: title,
+      message: message,
+      icon: Icon(
+        Icons.info_outline,
+        color: utils.primary,
+        size: 34.0,
+      ),
+      //dismissDirection: FlushbarDismissDirection.HORIZONTAL,
+      //flushbarStyle: FlushbarStyle.GROUNDED,
+      isDismissible: false,
+      mainButton: FlatButton(
+          child: Text("Aceptar", style: TextStyle(color: Colors.amber)),
+          onPressed: () {
+            flush.dismiss(true); // result = true
+          }),
+    )..show(context);
   }
 }
