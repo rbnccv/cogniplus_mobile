@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/pages/cuestionario_pages.dart';
+import 'package:cogniplus_mobile/src/pages/video_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flushbar/flushbar.dart';
@@ -236,13 +237,11 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
 
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
-        _showSnack("Guaradar", body.toString(), context);
+        _showSnack("Evaluación", body["message"], context);
       } else {
         _showSnack("Error", "Error al intentar guardar el resultado.", context);
       }
-
     }
-    
   }
 
   Widget _starsQuestion(BuildContext context, int rating) {
@@ -279,7 +278,8 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
             flush.dismiss(true); // result = true
           }),
     )..show(context).then((result) {
-        Navigator.of(context).pushReplacementNamed('video', arguments: _adulto);
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => VideoPage(adulto: this._adulto)));
       });
   }
 }

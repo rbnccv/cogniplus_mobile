@@ -267,7 +267,8 @@ class _VideoPageState extends State<VideoPage> {
 
     await Api().setPostDataFromApi(
         url: '/senior_videos/' + widget.adulto.id.toString(), data: info);
-    _videoPlayerController.pause();
+    //_videoPlayerController.pause();
+    _videoPlayerController.dispose();
 
     Navigator.of(context).push(MaterialPageRoute(
         builder: (BuildContext contex) => CuestionarioPage(info: {

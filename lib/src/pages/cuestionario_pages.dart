@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/pages/evaluacion_pages.dart';
+import 'package:cogniplus_mobile/src/pages/video_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flushbar/flushbar.dart';
@@ -183,7 +184,10 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold)))),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => VideoPage(
+                    adulto: this._adulto,
+                  ))),
         ),
         (isLandscape)
             ? Container()
