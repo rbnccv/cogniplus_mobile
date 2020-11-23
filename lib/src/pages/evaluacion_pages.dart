@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:cogniplus_mobile/src/pages/cuestionario_pages.dart';
+import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -216,23 +219,30 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
   }
 
   void _guardar() async {
-    if (_isButtonDisabled) {
-      setState(() {});
-      return null;
-    }
-
+    setState(() {});
     _isButtonDisabled = true;
+    if (_isButtonDisabled) {
+      Map<String, dynamic> result = {
+        "user_id": utils.user.id,
+        "senior_id": this._adulto.id,
+        "module_id": this._idModulo,
+        "video_id": this._idVideo,
+        "evaluation": this._editController.text,
+        "results": this._questions,
+      };
 
-    String now = DateFormat("yyyy/MM/dd").format(DateTime.now());
+      final response =
+          await Api().setPostDataFromApi(url: '/results', data: result);
 
-    try {
-      _showSnack('Mensaje enviado: ', 'message', context);
-    } on Exception catch (e) {
-      //print('Message not sent.');
-      //utils.showToast(context, 'Error al enviar el correo!!!');
+      if (response.statusCode == 200) {
+        var body = json.decode(response.body);
+        _showSnack("Guaradar", body.toString(), context);
+      } else {
+        _showSnack("Error", "Error al intentar guardar el resultado.", context);
+      }
 
-      _showSnack('Mensaje no enviado', e?.toString(), context);
     }
+    
   }
 
   Widget _starsQuestion(BuildContext context, int rating) {
