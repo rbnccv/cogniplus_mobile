@@ -42,7 +42,15 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_launcher_icons: "^0.7.5"
+  flutter_launcher_icons: "^0.8.1"
+
+flutter_icons:
+  ios: true
+  android: true
+  image_path_ios: "assets/launcher/icono.png"
+  image_path_android: "assets/launcher/icono.png"
+  adaptive_icon_background: "assets/launcher/icono.png"
+  adaptive_icon_foreground: "assets/launcher/icono.png"
 
 flutter:
 
@@ -51,8 +59,7 @@ flutter:
   assets:
     - assets/svg/
     - assets/images/
-    - assets/videos/
-    
+        
   fonts:
     - family: Quicksand
       fonts:
