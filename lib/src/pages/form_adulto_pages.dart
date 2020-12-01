@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
-import 'package:cogniplus_mobile/src/providers/db_provider.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -555,53 +554,11 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
 
     var connectivity = await Connectivity().checkConnectivity();
 
-    if (connectivity == ConnectivityResult.none) {
-      await _storeInDatabase(context);
-    } else {
+    if (connectivity != ConnectivityResult.none) {
       await _storeInNetwork(context);
     }
     //Navigator.of(context).pop();
     Navigator.of(context).pushReplacementNamed('home');
-  }
-
-  _storeInDatabase(BuildContext context) async {
-    utils.showToast(context, 'Fuera de linea');
-
-    AdultoModel adulto = new AdultoModel(
-        nombres: _nombre,
-        apellidos: _apellidos,
-        sexo: _sexo,
-        escolaridad: _escolaridad,
-        fechaNacimiento: _fechaNacimiento,
-        ingresos: _ingresos,
-        rut: _rut,
-        fono: _fono,
-        m1: 1,
-        m2: 0,
-        m3: 0,
-        m4: 0,
-        m1v: '[1,0,0,0,0,0,0]',
-        m2v: '[0,0,0,0,0,0]',
-        m3v: '[0,0,0,0,0,0]',
-        m4v: '[0,0,0,0,0,0]',
-        infoAdicional: _info);
-
-    int res;
-    String msg;
-    if (_isUpdate && _id != 0) {
-      adulto.id = _id;
-      res = await DBProvider.db.updateAdulto(adulto);
-      msg = '${adulto.nombres} ${adulto.apellidos}, actualizado.';
-    } else {
-      res = await DBProvider.db.insertAdulto(adulto);
-      msg = '${adulto.nombres} ${adulto.apellidos}, registrado.';
-    }
-
-    if (res <= 0) {
-      utils.showToast(context, 'Error al registrar a:  ${adulto.nombres}');
-      return null;
-    }
-    utils.showToast(context, msg);
   }
 
   _storeInNetwork(BuildContext context) async {
@@ -645,6 +602,5 @@ class _FormAdultoPageState extends State<FormAdultoPage> {
     }
     utils.showToast(context, msg);
     //utils.showToast(_formKey.currentContext, body.toString());
-    
   }
 }

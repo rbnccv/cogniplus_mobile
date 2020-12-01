@@ -1,34 +1,20 @@
 import 'dart:convert';
 
 import 'package:cogniplus_mobile/appConfig.dart';
-import 'package:cogniplus_mobile/src/data/data.dart';
-import 'package:cogniplus_mobile/src/model/response_api.dart';
-import 'package:cogniplus_mobile/src/model/send_mail_mixin.dart';
 import 'package:cogniplus_mobile/src/pages/cuestionario_pages.dart';
-
 import 'package:cogniplus_mobile/src/providers/api.dart';
-import 'package:cogniplus_mobile/src/widgets/togglebar_widget.dart';
 import 'package:cogniplus_mobile/src/widgets/togglebtn_widget.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
-import 'package:cogniplus_mobile/src/model/historial_model.dart';
-import 'package:cogniplus_mobile/src/providers/db_provider.dart';
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
-import 'package:path_provider/path_provider.dart';
-
 import 'package:cogniplus_mobile/src/widgets/videp_player_widget.dart';
-import 'package:cogniplus_mobile/src/model/response_api.dart';
 import 'package:video_player/video_player.dart';
-import 'package:cogniplus_mobile/src/widgets/videp_player_widget.dart';
 
-//Text('headline', style: Theme.of(context).textTheme.headline,),
+
 
 class VideoPage extends StatefulWidget {
   final AdultoModel adulto;

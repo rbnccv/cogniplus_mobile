@@ -6,14 +6,13 @@ import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:flutter/material.dart';
 
-import 'package:cogniplus_mobile/src/providers/db_provider.dart';
+
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
-import 'package:cogniplus_mobile/src/model/historial_model.dart';
+
 
 class EvaluacionPage extends StatefulWidget {
   final Map<String, dynamic> info;

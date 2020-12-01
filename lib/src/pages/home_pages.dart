@@ -5,7 +5,6 @@ import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/pages/form_adulto_pages.dart';
 import 'package:cogniplus_mobile/src/pages/video_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
-import 'package:cogniplus_mobile/src/providers/db_provider.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -161,11 +160,7 @@ class _HomePageState extends State<HomePage> {
                   icon: Icons.delete,
                   onTap: () async {
                     var id = list[index].id;
-                    if (_connectivity == ConnectivityResult.none) {
-                      DBProvider.db.deleteAdultoById(id);
-                      utils.showToast(
-                          context, '${list[index].nombres} borrado.');
-                    } else {
+                    if (_connectivity != ConnectivityResult.none) {
                       var response = await Api()
                           .delDataFromApi(url: '/seniors/' + id.toString());
                       var body = await json.decode(response.body);
@@ -185,15 +180,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<AdultoModel>> _getList(BuildContext context) async {
-    if (_connectivity == ConnectivityResult.none) {
-      return _fromDatabase(context);
-    } else {
+    if (_connectivity != ConnectivityResult.none) {
       return _fromNetwork(context);
     }
-  }
-
-  Future<List<AdultoModel>> _fromDatabase(BuildContext context) {
-    return DBProvider.db.getAllAdultos(utils.user.id);
   }
 
   Future<List<AdultoModel>> _fromNetwork(BuildContext context) async {

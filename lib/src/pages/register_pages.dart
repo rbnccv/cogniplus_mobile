@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/providers/api.dart';
-import 'package:cogniplus_mobile/src/providers/db_provider.dart';
 import 'package:cogniplus_mobile/src/widgets/input_text.dart';
 import 'package:flutter/material.dart';
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
@@ -214,41 +213,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
     var connectivity = await Connectivity().checkConnectivity();
 
-    if (connectivity == ConnectivityResult.none) {
-      _registerFromDatabase(data, context);
-    } else {
+    if (connectivity != ConnectivityResult.none) {
       _registerFromNetwork(data, context);
     }
-  }
-
-  _registerFromDatabase(data, context) async {
-    utils.showToast(context, 'Offline');
-
-    utils.user = await DBProvider.db.getUserBy(field: 'email', value: _email);
-    if (utils.user == null) {
-      utils.showSnack('Mensaje', 'El usuario no existe.', context);
-      setState(() {
-        _isLoading = false;
-      });
-
-      return null;
-    }
-
-    if (!await DBProvider.db
-        .verifyUserPass(email: _email, password: _password)) {
-      utils.showSnack('Mensaje', 'Contraseña incorrecta.', context);
-      setState(() {
-        _isLoading = false;
-      });
-
-      return null;
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    Navigator.of(context).pushReplacementNamed('login');
   }
 
   _registerFromNetwork(data, context) async {

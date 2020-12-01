@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/model/user_model.dart';
+import 'package:cogniplus_mobile/src/pages/home_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
-import 'package:cogniplus_mobile/src/providers/db_provider.dart';
 import 'package:cogniplus_mobile/src/widgets/input_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -14,7 +14,9 @@ import 'package:connectivity/connectivity.dart';
 //Text('headline', style: Theme.of(context).textTheme.headline,),
 
 class LoginPage extends StatefulWidget {
-  static final _formKey = GlobalKey<FormState>();
+  //static final _formKey = GlobalKey<FormState>();
+
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -25,16 +27,24 @@ class _LoginPageState extends State<LoginPage> {
   String _password;
   bool _rememberMe = false;
   bool _isLoading = false;
+  FlutterSecureStorage _storage = FlutterSecureStorage();
+  String _userEmail;
 
   final Widget figure =
       new SvgPicture.asset('assets/svg/figura.svg', color: Colors.grey);
 
   @override
   void initState() {
+    setInit();
     super.initState();
     if (utils.user != null) {
-      Navigator.of(context).pushReplacementNamed('home');
+      Navigator.of(context).push(
+          MaterialPageRoute(builder: (BuildContext context) => HomePage()));
     }
+  }
+
+  setInit() async {
+    _userEmail = await utils.readPreference("user_email");
   }
 
   @override
@@ -124,13 +134,13 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _getWidgetLoginForm() {
     return Form(
-      key: LoginPage._formKey,
+      key: widget._formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           InputText(
               hint: "Correo electrónico",
-              value: "rbnccv@gmail.com",
+              value: (this._userEmail != null) ? this._userEmail : "",
               onSaved: (value) => _email = value,
               inputType: TextInputType.emailAddress,
               fontSize: 20,
@@ -195,34 +205,13 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // dynamic _loginUser(BuildContext context) async {
-  //   if (!LoginPage._formKey.currentState.validate()) return null;
-
-  //   LoginPage._formKey.currentState.save();
-
-  //   utils.user = await DBProvider.db.getUserByName(_name);
-  //   if (utils.user == null) {
-  //     utils.showToast(context, "El usuario no existe.");
-  //     return null;
-  //   }
-
-  //   if (!await DBProvider.db.verifyUserPass(_name, _pass)) {
-  //     utils.showToast(context, 'Contraseña incorrecta.');
-  //     return null;
-  //   }
-
-  //   Navigator.of(context).pushReplacementNamed('home');
-
-  //   //Navigator.of(context).pushNamed('/');
-  // }
-
   void _loginUser(BuildContext context) async {
-    if (!LoginPage._formKey.currentState.validate()) {
+    if (!widget._formKey.currentState.validate()) {
       _isLoading = false;
       return null;
     }
 
-    LoginPage._formKey.currentState.save();
+    widget._formKey.currentState.save();
 
     var data = {
       'email': _email.trim(),
@@ -232,41 +221,9 @@ class _LoginPageState extends State<LoginPage> {
 
     var connectivity = await Connectivity().checkConnectivity();
 
-    if (connectivity == ConnectivityResult.none) {
-      _loginFromDatabase(data, context);
-    } else {
+    if (connectivity != ConnectivityResult.none) {
       _loginFromNetwork(data, context);
     }
-  }
-
-  _loginFromDatabase(data, context) async {
-    utils.showToast(context, 'Offline');
-
-    utils.user = await DBProvider.db.getUserBy(field: 'email', value: _email);
-    if (utils.user == null) {
-      utils.showSnack('Mensaje', 'El usuario no existe.', context);
-      setState(() {
-        _isLoading = false;
-      });
-
-      return null;
-    }
-
-    if (!await DBProvider.db
-        .verifyUserPass(email: _email, password: _password)) {
-      utils.showSnack('Mensaje', 'Contraseña incorrecta.', context);
-      setState(() {
-        _isLoading = false;
-      });
-
-      return null;
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    Navigator.of(context).pushReplacementNamed('home');
   }
 
   _loginFromNetwork(data, context) async {
@@ -276,18 +233,19 @@ class _LoginPageState extends State<LoginPage> {
       var response = await Api().authData(data, '/auth/login');
       var body = json.decode(response.body);
 
-      print(body.toString());
-      
       if (body['access_token'] != null) {
         utils.user =
             UserModel(id: body['id'], name: body['name'], email: body['email']);
 
-        FlutterSecureStorage storage = FlutterSecureStorage();
-        storage.write(key: 'access_token', value: body['access_token']);
-        storage.write(key: 'token_type', value: body['token_type']);
-        storage.write(key: 'expires_at', value: body['expires_at']);
+        await _storage.write(key: 'access_token', value: body['access_token']);
+        await _storage.write(key: 'token_type', value: body['token_type']);
+        await _storage.write(key: 'expires_at', value: body['expires_at']);
 
-        Navigator.of(context).pushReplacementNamed('home');
+        utils.savePreference("user_email", data["email"]);
+
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+          return HomePage();
+        }));
       } else {
         setState(() {
           _isLoading = false;
