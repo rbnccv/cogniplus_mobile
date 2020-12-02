@@ -1,10 +1,14 @@
-import 'package:cogniplus_mobile/src/pages/login_pages.dart';
+import 'package:cogniplus_mobile/src/pages/login_user_page.dart';
+import 'package:cogniplus_mobile/src/providers/userSharedPreferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import './src/utils/utils.dart';
 
-void main() {
- 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final preferences = new UserSharedPreferences();
+  await preferences.initPreferences();
+
   return runApp(new CogniApp());
 }
 
@@ -27,7 +31,7 @@ class CogniApp extends StatelessWidget {
         scaffoldBackgroundColor: scaffoldBackground,
         fontFamily: 'Quicksand',
       ),
-      home: LoginPage(),
+      home: LoginUserPage(),
     );
   }
 }

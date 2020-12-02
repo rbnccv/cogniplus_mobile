@@ -1,12 +1,11 @@
 import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/model/user_model.dart';
-import 'package:cogniplus_mobile/src/pages/login_pages.dart';
+import 'package:cogniplus_mobile/src/pages/login_user_page.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 UserModel user;
 
@@ -106,7 +105,7 @@ logoff(BuildContext context) async {
 
   showToast(context, body['message']);
   Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => LoginPage()),
+      MaterialPageRoute(builder: (context) => LoginUserPage()),
       (Route<dynamic> route) => false);
 }
 
@@ -130,15 +129,4 @@ onBackPressed(BuildContext context) {
         ),
       ) ??
       false;
-}
-
-Future<String> readPreference(String key) async {
-  final sharedPreferences = await SharedPreferences.getInstance();
-  String value = sharedPreferences.getString(key);
-  return value;
-}
-
-void savePreference(String key, String value) async {
-  final sharedPreferences = await SharedPreferences.getInstance();
-  sharedPreferences.setString(key, value);
 }

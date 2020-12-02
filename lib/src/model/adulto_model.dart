@@ -10,14 +10,6 @@ class AdultoModel {
   String fechaNacimiento;
   String ingresos;
   String fono;
-  int m1;
-  int m2;
-  int m3;
-  int m4;
-  String m1v;
-  String m2v;
-  String m3v;
-  String m4v;
   String infoAdicional;
 
   AdultoModel(
@@ -30,14 +22,6 @@ class AdultoModel {
       this.fechaNacimiento,
       this.ingresos,
       this.fono,
-      this.m1,
-      this.m2,
-      this.m3,
-      this.m4,
-      this.m1v,
-      this.m2v,
-      this.m3v,
-      this.m4v,
       this.infoAdicional});
 
   static AdultoModel toAdultoModelFromNetwork({String string}) {
@@ -67,14 +51,6 @@ class AdultoModel {
       fechaNacimiento: json['fechaNacimiento'],
       ingresos: json['ingresos'],
       fono: json['fono'],
-      m1: json['m1'],
-      m2: json['m2'],
-      m3: json['m3'],
-      m4: json['m4'],
-      m1v: json['m1v'],
-      m2v: json['m2v'],
-      m3v: json['m3v'],
-      m4v: json['m4v'],
       infoAdicional: json['infoAdicional']);
 
   Map<String, dynamic> toJson() => {
@@ -87,14 +63,6 @@ class AdultoModel {
         "fechaNacimiento": this.fechaNacimiento,
         "ingresos": this.ingresos,
         "fono": this.fono,
-        "m1": this.m1,
-        "m2": this.m2,
-        "m3": this.m3,
-        "m4": this.m4,
-        "m1v": this.m1v,
-        "m2v": this.m2v,
-        "m3v": this.m3v,
-        "m4v": this.m4v,
         "infoAdicional": this.infoAdicional
       };
 }

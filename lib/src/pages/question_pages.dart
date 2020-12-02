@@ -4,7 +4,6 @@ import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/pages/evaluacion_pages.dart';
 import 'package:cogniplus_mobile/src/pages/video_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:flushbar/flushbar.dart';
 //import 'package:cogniplus/src/model/video_model.dart';
 import 'package:flutter/material.dart';
@@ -12,20 +11,19 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 
-class CuestionarioPage extends StatefulWidget {
+class QuestionPage extends StatefulWidget {
   final Map<String, dynamic> info;
 
-  const CuestionarioPage({Key key, this.info}) : super(key: key);
+  const QuestionPage({Key key, this.info}) : super(key: key);
   @override
-  _CuestionarioPageState createState() => _CuestionarioPageState();
+  _QuestionPageState createState() => _QuestionPageState();
 }
 
-class _CuestionarioPageState extends State<CuestionarioPage> {
+class _QuestionPageState extends State<QuestionPage> {
   AdultoModel _adulto;
   int _idVideo;
   int _idModulo;
   Future<List<dynamic>> _response;
-  ConnectivityResult _connectivity;
 
   List<dynamic> _questions = [];
   @override
@@ -38,8 +36,7 @@ class _CuestionarioPageState extends State<CuestionarioPage> {
     _response = _getRequest();
     _adulto = widget.info['adulto'];
     _idModulo = widget.info['idModulo'];
-    _idVideo = widget.info['idVideo'];
-    _connectivity = await Connectivity().checkConnectivity();
+    _idVideo = widget.info['idVideo'];    
 
     _questions = await _response;
 

@@ -7,14 +7,14 @@ import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:connectivity/connectivity.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterUserPage extends StatefulWidget {
   static final _registerFormKey = GlobalKey<FormState>();
 
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  _RegisterUserPageState createState() => _RegisterUserPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterUserPageState extends State<RegisterUserPage> {
   String _name;
   String _email;
   String _password;
@@ -112,7 +112,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _getWidgetLoginForm() {
     return Form(
-      key: RegisterPage._registerFormKey,
+      key: RegisterUserPage._registerFormKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
@@ -191,12 +191,12 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _registerUser(BuildContext context) async {
-    if (!RegisterPage._registerFormKey.currentState.validate()) {
+    if (!RegisterUserPage._registerFormKey.currentState.validate()) {
       _isLoading = false;
       return null;
     }
 
-    RegisterPage._registerFormKey.currentState.save();
+    RegisterUserPage._registerFormKey.currentState.save();
 
     var data = {
       'name': _name,

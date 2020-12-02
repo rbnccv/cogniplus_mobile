@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
-import 'package:cogniplus_mobile/src/pages/form_adulto_pages.dart';
+import 'package:cogniplus_mobile/src/pages/register_senior_page.dart';
 import 'package:cogniplus_mobile/src/pages/video_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
@@ -15,16 +16,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:easy_permission_validator/easy_permission_validator.dart';
 import 'package:path/path.dart';
 
-//import 'package:flutter/src/services/system_sound.dart';
-
-//Text('headline', style: Theme.of(context).textTheme.headline,),
-
-class HomePage extends StatefulWidget {
+class SeniorListPage extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _SeniorListPageState createState() => _SeniorListPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _SeniorListPageState extends State<SeniorListPage> {
   GlobalKey<RefreshIndicatorState> _refreshKey;
   ConnectivityResult _connectivity;
 
@@ -41,30 +38,46 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _appBar(context),
-      body: SafeArea(
-          child: (utils.user.name == 'admin')
-              ? _showDialogSaveDatabase(context)
-              : RefreshIndicator(
-                  key: _refreshKey,
-                  semanticsLabel: "semantic label",
-                  onRefresh: () async {
-                    _drawList(context);
-                  },
-                  child: _drawList(context))),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.add,
-          size: 50.0,
+    return WillPopScope(
+      child: Scaffold(
+        appBar: _appBar(context),
+        body: SafeArea(
+            child: (utils.user.name == 'admin')
+                ? _showDialogSaveDatabase(context)
+                : RefreshIndicator(
+                    key: _refreshKey,
+                    semanticsLabel: "semantic label",
+                    onRefresh: () async {
+                      _drawList(context);
+                    },
+                    child: _drawList(context))),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(
+            Icons.add,
+            size: 50.0,
+          ),
+          backgroundColor: Theme.of(context).primaryColor,
+          onPressed: () {
+            //Navigator.of(context).pushNamed('formadulto');
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) => RegisterSeniorPage()));
+          },
         ),
-        backgroundColor: Theme.of(context).primaryColor,
-        onPressed: () {
-          //Navigator.of(context).pushNamed('formadulto');
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (BuildContext context) => FormAdultoPage()));
-        },
       ),
+      onWillPop: () => showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text("Advertencia"),
+                content: Text("¿Desea salir de la Aplicación?"),
+                actions: [
+                  FlatButton(
+                      onPressed: () => SystemChannels.platform.invokeMethod("SystemNavigator.pop"),
+                      child: Text("SI")),
+                  FlatButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text("NO"))
+                ],
+              )),
     );
   }
 
@@ -149,7 +162,7 @@ class _HomePageState extends State<HomePage> {
                     //    .pushNamed('formadulto', arguments: list[index]);
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            FormAdultoPage(adulto: list[index])));
+                            RegisterSeniorPage(adulto: list[index])));
                   },
                 ),
               ],
@@ -180,9 +193,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<AdultoModel>> _getList(BuildContext context) async {
-    if (_connectivity != ConnectivityResult.none) {
-      return _fromNetwork(context);
-    }
+    return _fromNetwork(context);
   }
 
   Future<List<AdultoModel>> _fromNetwork(BuildContext context) async {

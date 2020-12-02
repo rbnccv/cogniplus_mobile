@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
@@ -13,16 +12,16 @@ import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 
 enum TipoSexo { masculino, femenino }
 
-class FormAdultoPage extends StatefulWidget {
+class RegisterSeniorPage extends StatefulWidget {
   final AdultoModel adulto;
 
-  FormAdultoPage({this.adulto});
+  RegisterSeniorPage({this.adulto});
 
   @override
-  _FormAdultoPageState createState() => _FormAdultoPageState();
+  _RegisterSeniorPageState createState() => _RegisterSeniorPageState();
 }
 
-class _FormAdultoPageState extends State<FormAdultoPage> {
+class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
   ConnectivityResult _connectivity;
   static final _formKey = GlobalKey<FormState>();
 

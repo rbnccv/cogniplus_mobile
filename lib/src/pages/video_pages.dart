@@ -1,10 +1,9 @@
 import 'dart:convert';
 
 import 'package:cogniplus_mobile/appConfig.dart';
-import 'package:cogniplus_mobile/src/pages/cuestionario_pages.dart';
+import 'package:cogniplus_mobile/src/pages/question_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:cogniplus_mobile/src/widgets/togglebtn_widget.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -32,7 +31,7 @@ class _VideoPageState extends State<VideoPage> {
 
   bool _dialVisible = true;
   String url = "";
-  ConnectivityResult _connectivity;
+  
   Future<Map<String, dynamic>> _response;
 
   List<dynamic> _modules;
@@ -61,7 +60,6 @@ class _VideoPageState extends State<VideoPage> {
 
   _setInit() async {
     _response = _getRequest();
-    _connectivity = await Connectivity().checkConnectivity();
   }
 
   @override
@@ -257,7 +255,7 @@ class _VideoPageState extends State<VideoPage> {
     _videoPlayerController.dispose();
 
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext contex) => CuestionarioPage(info: {
+        builder: (BuildContext contex) => QuestionPage(info: {
               'adulto': widget.adulto,
               'idModulo': _idSelectedModule,
               'idVideo': _idSelectedVideo

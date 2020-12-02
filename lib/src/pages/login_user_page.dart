@@ -1,8 +1,9 @@
 import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/model/user_model.dart';
-import 'package:cogniplus_mobile/src/pages/home_pages.dart';
+import 'package:cogniplus_mobile/src/pages/seniors_list_page.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
+import 'package:cogniplus_mobile/src/providers/userSharedPreferences.dart';
 import 'package:cogniplus_mobile/src/widgets/input_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -13,16 +14,16 @@ import 'package:connectivity/connectivity.dart';
 
 //Text('headline', style: Theme.of(context).textTheme.headline,),
 
-class LoginPage extends StatefulWidget {
+class LoginUserPage extends StatefulWidget {
   //static final _formKey = GlobalKey<FormState>();
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _LoginUserPageState createState() => _LoginUserPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginUserPageState extends State<LoginUserPage> {
   String _email;
   String _password;
   bool _rememberMe = false;
@@ -30,21 +31,23 @@ class _LoginPageState extends State<LoginPage> {
   FlutterSecureStorage _storage = FlutterSecureStorage();
   String _userEmail;
 
+  final _preferences = new UserSharedPreferences();
+
   final Widget figure =
       new SvgPicture.asset('assets/svg/figura.svg', color: Colors.grey);
 
   @override
   void initState() {
-    setInit();
     super.initState();
     if (utils.user != null) {
-      Navigator.of(context).push(
-          MaterialPageRoute(builder: (BuildContext context) => HomePage()));
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) => SeniorListPage()));
     }
+    setInit();
   }
 
   setInit() async {
-    _userEmail = await utils.readPreference("user_email");
+    _userEmail = _preferences.userEmail;
   }
 
   @override
@@ -234,6 +237,7 @@ class _LoginPageState extends State<LoginPage> {
       var body = json.decode(response.body);
 
       if (body['access_token'] != null) {
+        _isLoading = false;
         utils.user =
             UserModel(id: body['id'], name: body['name'], email: body['email']);
 
@@ -241,11 +245,12 @@ class _LoginPageState extends State<LoginPage> {
         await _storage.write(key: 'token_type', value: body['token_type']);
         await _storage.write(key: 'expires_at', value: body['expires_at']);
 
-        utils.savePreference("user_email", data["email"]);
+        _preferences.userEmail = data["email"];
 
         Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return HomePage();
+          return SeniorListPage();
         }));
+        
       } else {
         setState(() {
           _isLoading = false;

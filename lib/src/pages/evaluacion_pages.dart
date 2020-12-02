@@ -1,9 +1,8 @@
 import 'dart:convert';
 
-import 'package:cogniplus_mobile/src/pages/cuestionario_pages.dart';
+import 'package:cogniplus_mobile/src/pages/question_pages.dart';
 import 'package:cogniplus_mobile/src/pages/video_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
@@ -28,7 +27,7 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
   int _idVideo;
   Map<String, dynamic> _response;
   List<dynamic> _questions;
-  ConnectivityResult _connectivity;
+
   final _editController = TextEditingController();
 
   bool _isButtonDisabled;
@@ -47,7 +46,7 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
     _response = widget.info["response"];
     _questions = _response["results"];
 
-    _connectivity = await Connectivity().checkConnectivity();
+    
   }
 
   @override
@@ -187,7 +186,7 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
                             fontWeight: FontWeight.bold)))),
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => CuestionarioPage(
+                  builder: (BuildContext context) => QuestionPage(
                         info: {
                           'adulto': _adulto,
                           'idModulo': _idModulo,
