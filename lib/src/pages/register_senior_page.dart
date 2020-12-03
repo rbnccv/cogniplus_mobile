@@ -505,9 +505,7 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
   }
 
   _getAdulto({int adultoId, BuildContext context}) {
-    if (_connectivity == ConnectivityResult.none) {
-      _fromDatabase(adultoId: adultoId, context: context);
-    } else {
+    if (_connectivity != ConnectivityResult.none) {
       _fromNetwork(adultoId: adultoId, context: context);
     }
   }
@@ -517,10 +515,6 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
         await Api().getDataFromApi(url: '/seniors/' + adultoId.toString());
     var body = response.body;
     _adulto = AdultoModel.toAdultoModelFromNetwork(string: body);
-  }
-
-  _fromDatabase({int adultoId, BuildContext context}) {
-    _adulto = AdultoModel();
   }
 
   _setFormFields(AdultoModel adulto) {
