@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/pages/evaluacion_pages.dart';
+import 'package:cogniplus_mobile/src/pages/seniors_list_page.dart';
 import 'package:cogniplus_mobile/src/pages/video_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:flushbar/flushbar.dart';
@@ -36,7 +37,7 @@ class _QuestionPageState extends State<QuestionPage> {
     _response = _getRequest();
     _adulto = widget.info['adulto'];
     _idModulo = widget.info['idModulo'];
-    _idVideo = widget.info['idVideo'];    
+    _idVideo = widget.info['idVideo'];
 
     _questions = await _response;
 
@@ -48,48 +49,54 @@ class _QuestionPageState extends State<QuestionPage> {
   @override
   Widget build(BuildContext context) {
     //VideoModel video = VideoModel(id: data[1], idModulo: data[2]);
-    return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              IconButton(
-                  icon: Icon(FontAwesomeIcons.question, color: Colors.white),
-                  onPressed: () {}),
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pushReplacementNamed('home');
-                },
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Icon(FontAwesomeIcons.solidUserCircle,
-                        color: Colors.white, size: 42),
-                    SizedBox(width: 5),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text('${_adulto.nombres}',
-                            style: utils.estBodyAccent16),
-                        Text('${_adulto.apellidos}',
-                            style: utils.estBodyAccent19),
-                      ],
-                    ),
-                  ],
+    return WillPopScope(
+      onWillPop: () {
+        return Future.value(false);
+      },
+      child: Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                IconButton(
+                    icon: Icon(FontAwesomeIcons.question, color: Colors.white),
+                    onPressed: () {}),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => SeniorListPage()));
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Icon(FontAwesomeIcons.solidUserCircle,
+                          color: Colors.white, size: 42),
+                      SizedBox(width: 5),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('${_adulto.nombres}',
+                              style: utils.estBodyAccent16),
+                          Text('${_adulto.apellidos}',
+                              style: utils.estBodyAccent19),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              IconButton(
-                  icon: Icon(FontAwesomeIcons.powerOff, color: Colors.white),
-                  onPressed: () => utils.logoff(context)),
-            ],
+                IconButton(
+                    icon: Icon(FontAwesomeIcons.powerOff, color: Colors.white),
+                    onPressed: () => utils.logoff(context)),
+              ],
+            ),
           ),
-        ),
-        body: SafeArea(
-            child: SingleChildScrollView(
-          physics: ScrollPhysics(),
-          child: _getBody(context, _adulto),
-        )));
+          body: SafeArea(
+              child: SingleChildScrollView(
+            physics: ScrollPhysics(),
+            child: _getBody(context, _adulto),
+          ))),
+    );
   }
 
   Widget _getBody(BuildContext context, AdultoModel adulto) {

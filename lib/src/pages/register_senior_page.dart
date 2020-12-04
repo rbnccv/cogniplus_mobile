@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
+import 'package:cogniplus_mobile/src/pages/seniors_list_page.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
@@ -22,8 +23,8 @@ class RegisterSeniorPage extends StatefulWidget {
 }
 
 class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
-  ConnectivityResult _connectivity;
-  static final _formKey = GlobalKey<FormState>();
+  
+  final _formKey = GlobalKey<FormState>();
 
   int _id = 0;
   AdultoModel _adulto;
@@ -118,7 +119,9 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
           ),
           IconButton(
               icon: Icon(FontAwesomeIcons.powerOff, color: Colors.white),
-              onPressed: () {}),
+              onPressed: () {
+                utils.logoff(context);
+              }),
         ],
       ),
     );
@@ -137,7 +140,7 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
 
     return Container(
         padding: EdgeInsets.fromLTRB(30.0, 20.0, 30.0, 30.0),
-        child: Form(
+        child:  Form(
             key: _formKey,
             child: Column(
               children: <Widget>[
@@ -231,7 +234,7 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
                                   textInputAction: TextInputAction.next,
                                   validator: (value) => null,
                                   inputFormatters: [
-                                    WhitelistingTextInputFormatter.digitsOnly,
+                                    FilteringTextInputFormatter.digitsOnly
                                   ],
                                   style: TextStyle(fontSize: 14),
                                   decoration: InputDecoration(
@@ -486,7 +489,7 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
           maxTime: DateTime(2050),
           onConfirm: (DateTime date) {
             setState(() {
-              _fechaNacimiento = DateFormat('dd-MM-yyyy').format(date);
+              _fechaNacimiento = DateFormat('yyyy-MM-dd').format(date);
             });
           },
           locale: LocaleType.es,
@@ -500,34 +503,23 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
     );
   }
 
-  _setConnectivity() async {
-    _connectivity = await Connectivity().checkConnectivity();
-  }
-
-  _getAdulto({int adultoId, BuildContext context}) {
-    if (_connectivity != ConnectivityResult.none) {
-      _fromNetwork(adultoId: adultoId, context: context);
-    }
-  }
-
-  _fromNetwork({int adultoId, BuildContext context}) async {
-    var response =
-        await Api().getDataFromApi(url: '/seniors/' + adultoId.toString());
-    var body = response.body;
-    _adulto = AdultoModel.toAdultoModelFromNetwork(string: body);
-  }
-
   _setFormFields(AdultoModel adulto) {
     bool isInGrade = _gradoEscolaridad
         .toString()
         .toLowerCase()
         .contains(adulto.escolaridad.toLowerCase());
 
+    if (adulto.escolaridad.trim() != "" && !isInGrade)
+      _gradoEscolaridad.add(adulto.escolaridad);
+
+    _escolaridad = adulto.escolaridad;
+
+    // _escolaridad =
+    //     isInGrade ? adulto.escolaridad : "Enseñanza básica incompleta";
+
     _id = adulto.id;
     _nombreTextController.text = adulto.nombres;
     _apellidoTextController.text = adulto.apellidos;
-    _escolaridad =
-        isInGrade ? adulto.escolaridad : "Enseñanza básica incompleta";
     _fechaNacimiento = adulto.fechaNacimiento;
     _ingresosTextController.text = adulto.ingresos;
     _rutTextController.text = adulto.rut;
@@ -536,7 +528,7 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
     _isUpdate = true;
 
     setState(() {
-      _radioValue = (adulto.sexo == 'F') ? 0 : 1;
+      _radioValue = (adulto.sexo == '0') ? 0 : 1;
       _sexo = adulto.sexo;
     });
   }
@@ -551,26 +543,29 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
       await _storeInNetwork(context);
     }
     //Navigator.of(context).pop();
-    Navigator.of(context).pushReplacementNamed('home');
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => SeniorListPage()));
+    //Navigator.of(context).pushReplacementNamed('home');
   }
 
   _storeInNetwork(BuildContext context) async {
     utils.showToast(context, 'En linea.');
 
-    DateTime tmp = DateFormat('dd-MM-yyyy').parse(_fechaNacimiento);
+    DateTime tmp = DateFormat('yyyy-MM-dd').parse(_fechaNacimiento);
 
     Map<String, dynamic> senior = {
       "user_id": utils.user.id,
       "rut": _rut,
       "names": _nombre,
       "last_names": _apellidos,
-      "gender": (_sexo == 'F') ? 0 : 1,
+      "gender": (_sexo == '0') ? 0 : 1,
       "course": _escolaridad,
       "phone": _fono,
       "email": _email,
       "birthday": DateFormat('yyyy-MM-dd').format(tmp),
       "revenue": _ingresos,
-      "info": _fono
+      "info": _info
     };
 
     String msg;

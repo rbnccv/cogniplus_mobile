@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cogniplus_mobile/appConfig.dart';
 import 'package:cogniplus_mobile/src/pages/question_pages.dart';
+import 'package:cogniplus_mobile/src/pages/seniors_list_page.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:cogniplus_mobile/src/widgets/togglebtn_widget.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +13,6 @@ import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 import 'package:cogniplus_mobile/src/widgets/videp_player_widget.dart';
 import 'package:video_player/video_player.dart';
-
-
 
 class VideoPage extends StatefulWidget {
   final AdultoModel adulto;
@@ -31,7 +30,7 @@ class _VideoPageState extends State<VideoPage> {
 
   bool _dialVisible = true;
   String url = "";
-  
+
   Future<Map<String, dynamic>> _response;
 
   List<dynamic> _modules;
@@ -66,15 +65,20 @@ class _VideoPageState extends State<VideoPage> {
   Widget build(BuildContext context) {
     navigatorKey = context;
 
-    return Scaffold(
-        drawer: _drawer(context),
-        appBar: _appbar(context),
-        body: SafeArea(
-          child: SingleChildScrollView(child: _getBody(context)),
-        ),
-        floatingActionButton: Builder(builder: (BuildContext context) {
-          return _floatingActionButton(context);
-        }));
+    return WillPopScope(
+      onWillPop: () {
+        return Future.value(false);
+      },
+      child: Scaffold(
+          drawer: _drawer(context),
+          appBar: _appbar(context),
+          body: SafeArea(
+            child: SingleChildScrollView(child: _getBody(context)),
+          ),
+          floatingActionButton: Builder(builder: (BuildContext context) {
+            return _floatingActionButton(context);
+          })),
+    );
   }
 
   AppBar _appbar(BuildContext context) {
@@ -88,7 +92,9 @@ class _VideoPageState extends State<VideoPage> {
               onPressed: () {}),
           GestureDetector(
             onTap: () {
-              Navigator.of(context).pushReplacementNamed('home');
+              _videoPlayerController?.dispose();
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => SeniorListPage()));
             },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,7 +114,10 @@ class _VideoPageState extends State<VideoPage> {
           ),
           IconButton(
               icon: Icon(FontAwesomeIcons.powerOff, color: Colors.white),
-              onPressed: () {}),
+              onPressed: () async {
+                await _videoPlayerController.pause();
+                await utils.logoff(context);
+              }),
         ],
       ),
     );
@@ -145,12 +154,6 @@ class _VideoPageState extends State<VideoPage> {
             label: 'Historial del video',
             labelStyle: TextStyle(fontSize: 12.0),
             onTap: () => Scaffold.of(context).openDrawer()),
-        SpeedDialChild(
-          child: Icon(FontAwesomeIcons.calendarCheck),
-          backgroundColor: Colors.blueGrey,
-          label: 'Objetivos del video',
-          labelStyle: TextStyle(fontSize: 12.0),
-        ),
         SpeedDialChild(
           child: Icon(FontAwesomeIcons.question),
           backgroundColor: utils.primary,
@@ -252,9 +255,9 @@ class _VideoPageState extends State<VideoPage> {
     await Api().setPostDataFromApi(
         url: '/senior_videos/' + widget.adulto.id.toString(), data: info);
     //_videoPlayerController.pause();
-    _videoPlayerController.dispose();
+    await _videoPlayerController?.dispose();
 
-    Navigator.of(context).push(MaterialPageRoute(
+    await Navigator.of(context).push(MaterialPageRoute(
         builder: (BuildContext contex) => QuestionPage(info: {
               'adulto': widget.adulto,
               'idModulo': _idSelectedModule,

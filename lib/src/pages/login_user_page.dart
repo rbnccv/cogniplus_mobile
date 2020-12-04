@@ -52,10 +52,15 @@ class _LoginUserPageState extends State<LoginUserPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: utils.primary,
-      body: SafeArea(
-        child: _createStack(context),
+    return WillPopScope(
+      onWillPop: () {
+        return Future.value(false);
+      },
+      child: Scaffold(
+        backgroundColor: utils.primary,
+        body: SafeArea(
+          child: _createStack(context),
+        ),
       ),
     );
   }
@@ -250,7 +255,6 @@ class _LoginUserPageState extends State<LoginUserPage> {
         Navigator.of(context).push(MaterialPageRoute(builder: (context) {
           return SeniorListPage();
         }));
-        
       } else {
         setState(() {
           _isLoading = false;

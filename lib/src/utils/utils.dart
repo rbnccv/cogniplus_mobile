@@ -104,9 +104,12 @@ logoff(BuildContext context) async {
   var body = json.decode(response.body);
 
   showToast(context, body['message']);
-  Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => LoginUserPage()),
-      (Route<dynamic> route) => false);
+  // Navigator.of(context).pushAndRemoveUntil(
+  //     MaterialPageRoute(builder: (context) => LoginUserPage()),
+  //     (Route<dynamic> route) => false);
+
+  Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => LoginUserPage()));
 }
 
 onBackPressed(BuildContext context) {

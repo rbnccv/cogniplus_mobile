@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/pages/register_senior_page.dart';
@@ -12,24 +11,23 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:easy_permission_validator/easy_permission_validator.dart';
-import 'package:path/path.dart';
 
 class SeniorListPage extends StatefulWidget {
+  final GlobalKey<RefreshIndicatorState> _refreshKey =
+      GlobalKey<RefreshIndicatorState>();
   @override
   _SeniorListPageState createState() => _SeniorListPageState();
 }
 
 class _SeniorListPageState extends State<SeniorListPage> {
-  GlobalKey<RefreshIndicatorState> _refreshKey;
   ConnectivityResult _connectivity;
 
   @override
   void initState() {
     super.initState();
-    _refreshKey = GlobalKey<RefreshIndicatorState>();
     _setConnectivity();
+    WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) => widget._refreshKey.currentState.show());
   }
 
   _setConnectivity() async {
@@ -42,15 +40,15 @@ class _SeniorListPageState extends State<SeniorListPage> {
       child: Scaffold(
         appBar: _appBar(context),
         body: SafeArea(
-            child: (utils.user.name == 'admin')
-                ? _showDialogSaveDatabase(context)
-                : RefreshIndicator(
-                    key: _refreshKey,
-                    semanticsLabel: "semantic label",
-                    onRefresh: () async {
-                      _drawList(context);
-                    },
-                    child: _drawList(context))),
+            child: RefreshIndicator(
+                key: widget._refreshKey,
+                semanticsLabel: "Loading list of Seniors",
+                onRefresh: () async {
+                  setState(() {
+                    _drawList(context);
+                  });
+                },
+                child: _drawList(context))),
         floatingActionButton: FloatingActionButton(
           child: Icon(
             Icons.add,
@@ -71,7 +69,8 @@ class _SeniorListPageState extends State<SeniorListPage> {
                 content: Text("¿Desea salir de la Aplicación?"),
                 actions: [
                   FlatButton(
-                      onPressed: () => SystemChannels.platform.invokeMethod("SystemNavigator.pop"),
+                      onPressed: () => SystemChannels.platform
+                          .invokeMethod("SystemNavigator.pop"),
                       child: Text("SI")),
                   FlatButton(
                       onPressed: () => Navigator.pop(context, false),
@@ -202,110 +201,22 @@ class _SeniorListPageState extends State<SeniorListPage> {
     var response =
         await Api().getDataFromApi(url: '/user/' + id.toString() + '/seniors');
 
+    print(json.decode(response.body));
+
     var body = (json.decode(response.body) as List).map((json) {
       return AdultoModel(
           id: json['id'],
           nombres: json['names'],
           apellidos: json['last_names'],
-          //sexo: json['gender'].toString(),p
+          sexo: json['gender'].toString(),
           escolaridad: json['course'],
           fechaNacimiento: json['birthday'],
           fono: json['phone'],
-          //ingresos: json['revenue'].toString(),
+          ingresos: json['revenue'].toString(),
           infoAdicional: json['info'],
           rut: json['rut']);
     }).toList();
 
     return body;
-  }
-
-  _showDialogSaveDatabase(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return SingleChildScrollView(
-      child: Center(
-        child: Column(
-          children: <Widget>[
-            Container(
-              width: size.width * 0.85,
-              margin: EdgeInsets.symmetric(vertical: 30.0),
-              padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 30),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 3.0,
-                      offset: Offset(0.0, 5.0),
-                      spreadRadius: 3.0)
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text('Obtención de datos.',
-                      style: TextStyle(
-                          fontSize: 22.0, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 30.0),
-                  Text(
-                    'La datos se almacenaran en el directorio download.',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  SizedBox(height: 25.0),
-                  SizedBox(
-                    width: double.infinity,
-                    child: RaisedButton(
-                        shape: RoundedRectangleBorder(
-                            side: BorderSide(color: Colors.grey)),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 70.0, vertical: 15.0),
-                          child: Text(
-                            'DESCARGAR.',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        elevation: 0.0,
-                        color: Colors.white,
-                        textColor: Colors.grey,
-                        onPressed: () async {
-                          /*await SimplePermissions.requestPermission(
-                              Permission.WriteExternalStorage);
-                          bool checkPermission =
-                              await SimplePermissions.checkPermission(
-                                  Permission.WriteExternalStorage);*/
-                          final permission = EasyPermissionValidator(
-                              context: context, appName: 'Cogniplus_mobile');
-
-                          final checkPermission = await permission.storage();
-
-                          if (checkPermission) {
-                            final Directory directory =
-                                await getApplicationDocumentsDirectory();
-                            final path = join(directory.path, 'cogniplus.db');
-                            String newPath =
-                                (await getExternalStorageDirectory())
-                                        .absolute
-                                        .path +
-                                    "/download/cogniplus.db";
-
-                            File file = new File(path);
-                            file.copy(newPath);
-
-                            (await file.exists())
-                                ? utils.showToast(
-                                    context, 'Base de datos en: $newPath')
-                                : utils.showToast(context,
-                                    'Error al copiar la base de datos.');
-                          }
-                        }),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
