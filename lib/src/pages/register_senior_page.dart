@@ -23,7 +23,6 @@ class RegisterSeniorPage extends StatefulWidget {
 }
 
 class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
-  
   final _formKey = GlobalKey<FormState>();
 
   int _id = 0;
@@ -112,7 +111,9 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
         children: <Widget>[
           IconButton(
               icon: Icon(FontAwesomeIcons.question, color: Colors.white),
-              onPressed: () {}),
+              onPressed: () {
+                utils.showIntroVideo(context);
+              }),
           Text(
             'Añadir perfil',
             style: utils.estTitulo,
@@ -140,7 +141,7 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
 
     return Container(
         padding: EdgeInsets.fromLTRB(30.0, 20.0, 30.0, 30.0),
-        child:  Form(
+        child: Form(
             key: _formKey,
             child: Column(
               children: <Widget>[

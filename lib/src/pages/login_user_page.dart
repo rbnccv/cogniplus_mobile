@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cogniplus_mobile/src/model/user_model.dart';
+import 'package:cogniplus_mobile/src/pages/register_user_page.dart';
 import 'package:cogniplus_mobile/src/pages/seniors_list_page.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:cogniplus_mobile/src/providers/userSharedPreferences.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 //Text('headline', style: Theme.of(context).textTheme.headline,),
 
@@ -26,10 +28,11 @@ class LoginUserPage extends StatefulWidget {
 class _LoginUserPageState extends State<LoginUserPage> {
   String _email;
   String _password;
-  bool _rememberMe = false;
+  bool _rememberMe = true;
   bool _isLoading = false;
   FlutterSecureStorage _storage = FlutterSecureStorage();
   String _userEmail;
+  String _userPass;
 
   final _preferences = new UserSharedPreferences();
 
@@ -48,6 +51,7 @@ class _LoginUserPageState extends State<LoginUserPage> {
 
   setInit() async {
     _userEmail = _preferences.userEmail;
+    _userPass = _preferences.userPass;
   }
 
   @override
@@ -78,32 +82,41 @@ class _LoginUserPageState extends State<LoginUserPage> {
                     padding: EdgeInsets.symmetric(vertical: 7, horizontal: 2),
                     child: Text('REGISTRATE', style: utils.estBodyWhite18)),
                 onPressed: () {
-                  Navigator.of(context).pushNamed('register');
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) {
+                    return RegisterUserPage();
+                  }));
                 })
           ])),
       Align(
           alignment: Alignment(0.9, 0.9),
           child: Container(
             width: 100.0,
-            height: 80.0,
+            height: 100.0,
             //color: Colors.red,
             child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Text('Siganos', style: utils.estBodyAccent14),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(FontAwesomeIcons.facebook, size: 35),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: Icon(FontAwesomeIcons.twitterSquare, size: 35),
-                        onPressed: () {},
-                      ),
-                    ],
-                  )
+                  Text(
+                    'Politicas de privacidad',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  IconButton(
+                    icon: Icon(FontAwesomeIcons.landmark, size: 25),
+                    onPressed: () async {
+                      const url = "https://cogniplus.cf/policy";
+                      if (await canLaunch(url)) {
+                        await launch(url);
+                      } else {
+                        throw "imposible lanzar la url: " + url;
+                      }
+                    },
+                  ),
                 ]),
           )),
     ]);
@@ -161,7 +174,7 @@ class _LoginUserPageState extends State<LoginUserPage> {
               }),
           SizedBox(height: 20, width: 0),
           InputText(
-              value: "Ruben_4U",
+              value: (this._userPass != null) ? this._userPass : "",
               hint: "Contraseña.",
               onSaved: (value) => _password = value,
               isSecure: true,
@@ -207,7 +220,7 @@ class _LoginUserPageState extends State<LoginUserPage> {
                 });
                 _loginUser(context);
               }),
-          Text('Olvide mi contraseña', style: utils.estBodyAccent14),
+          //Text('Olvide mi contraseña', style: utils.estBodyAccent14),
         ],
       ),
     );
@@ -251,6 +264,7 @@ class _LoginUserPageState extends State<LoginUserPage> {
         await _storage.write(key: 'expires_at', value: body['expires_at']);
 
         _preferences.userEmail = data["email"];
+        _preferences.userPass = data["password"];
 
         Navigator.of(context).push(MaterialPageRoute(builder: (context) {
           return SeniorListPage();

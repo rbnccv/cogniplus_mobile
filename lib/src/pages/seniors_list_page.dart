@@ -91,7 +91,9 @@ class _SeniorListPageState extends State<SeniorListPage> {
                 FontAwesomeIcons.question,
                 color: Colors.white,
               ),
-              onPressed: () {}),
+              onPressed: () {
+                utils.showIntroVideo(context);
+              }),
           Text(
             'Seleccione perfil',
             style: utils.estTitulo,

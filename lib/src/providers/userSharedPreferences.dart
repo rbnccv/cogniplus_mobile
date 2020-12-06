@@ -15,12 +15,20 @@ class UserSharedPreferences {
   initPreferences() async {
     this._preferences = await SharedPreferences.getInstance();
   }
-  
+
   get userEmail {
     return _preferences.getString("user_email");
   }
 
   set userEmail(String value) {
     _preferences.setString("user_email", value);
+  }
+
+  get userPass {
+    return _preferences.getString("user_pass");
+  }
+
+  set userPass(String value) {
+    _preferences.setString("user_pass", value);
   }
 }

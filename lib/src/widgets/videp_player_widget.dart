@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
-class Video_player extends StatefulWidget {
+class VideoPlayerWidget extends StatefulWidget {
   final VideoPlayerController videocontroller;
   final UniqueKey newKey;
+  final bool showControls;
+  final bool allowFullScreen;
+  final double aspectRatio;
+  final bool autoplay;
 
-  Video_player({this.videocontroller, this.newKey}) : super(key: newKey);
+  VideoPlayerWidget(
+      {this.videocontroller,
+      this.newKey,
+      this.showControls = true,
+      this.allowFullScreen = true,
+      this.aspectRatio = 16 / 9,
+      this.autoplay = true})
+      : super(key: newKey);
 
   @override
-  _Video_playerState createState() => _Video_playerState();
+  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
 }
 
-class _Video_playerState extends State<Video_player> {
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   ChewieController _chewieController;
 
   @override
@@ -26,8 +38,16 @@ class _Video_playerState extends State<Video_player> {
         videoPlayerController: widget.videocontroller,
         autoInitialize: true,
         looping: false,
-        showControls: true,
-        autoPlay: true,
+        showControls: widget.showControls,
+        allowFullScreen: widget.allowFullScreen,
+        aspectRatio: widget.aspectRatio,
+        autoPlay: widget.autoplay,
+        deviceOrientationsAfterFullScreen: [
+          DeviceOrientation.landscapeRight,
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ],
         errorBuilder: (context, errorMessage) {
           return Center(
             child: Text(

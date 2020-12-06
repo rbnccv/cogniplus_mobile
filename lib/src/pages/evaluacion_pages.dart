@@ -60,7 +60,9 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
               children: <Widget>[
                 IconButton(
                     icon: Icon(FontAwesomeIcons.question, color: Colors.white),
-                    onPressed: () {}),
+                    onPressed: () {
+                      utils.showIntroVideo(context);
+                    }),
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(

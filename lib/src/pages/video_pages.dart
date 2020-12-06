@@ -89,7 +89,9 @@ class _VideoPageState extends State<VideoPage> {
         children: <Widget>[
           IconButton(
               icon: Icon(FontAwesomeIcons.question, color: Colors.white),
-              onPressed: () {}),
+              onPressed: () {
+                utils.showIntroVideo(context);
+              }),
           GestureDetector(
             onTap: () {
               _videoPlayerController?.dispose();
@@ -124,7 +126,75 @@ class _VideoPageState extends State<VideoPage> {
   }
 
   Drawer _drawer(BuildContext context) {
-    return Drawer();
+    return Drawer(
+      elevation: 10,
+      child: Material(
+        child: SafeArea(
+          child: Container(
+            decoration: BoxDecoration(color: utils.primary),
+            child: Column(
+              children: [
+                SizedBox(height: 10),
+                Image.asset(
+                  "assets/images/logo.png",
+                  width: 200,
+                ),
+                SizedBox(height: 30),
+                FutureBuilder(
+                    future: _response,
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      final Map<String, dynamic> response = snapshot.data;
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasData) {
+                          final List videos = response["all_viewed_videos"];
+
+                          return Expanded(
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: videos.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return ListTile(
+                                    onTap: () {
+                                      // utils.showWindow(
+                                      //     context: context,
+                                      //     idModulo: videos[index]["module_id"],
+                                      //     idVideo: i);
+                                    },
+                                    tileColor: Colors.white,
+                                    leading: Icon(
+                                      (videos[index]['showed'])
+                                          ? Icons.lock_open
+                                          : Icons.lock,
+                                      color: (videos[index]['showed'])
+                                          ? utils.primary
+                                          : Colors.grey,
+                                      size: 32,
+                                    ),
+                                    title: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(videos[index]['name']),
+                                        Text("módulo: " +
+                                            videos[index]['module_id']
+                                                .toString()),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                          );
+                        }
+                      }
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   SpeedDial _floatingActionButton(BuildContext context) {
@@ -155,11 +225,21 @@ class _VideoPageState extends State<VideoPage> {
             labelStyle: TextStyle(fontSize: 12.0),
             onTap: () => Scaffold.of(context).openDrawer()),
         SpeedDialChild(
+            child: Icon(Icons.info_outline),
+            backgroundColor: utils.accent,
+            label: 'Información acerca de los videos.',
+            labelStyle: TextStyle(fontSize: 12.0),
+            onTap: () {
+              utils.showInfo(context);
+            }),
+        SpeedDialChild(
           child: Icon(FontAwesomeIcons.question),
           backgroundColor: utils.primary,
           label: 'video de introducción',
           labelStyle: TextStyle(fontSize: 12.0),
-          onTap: () {},
+          onTap: () {
+            utils.showIntroVideo(context);
+          },
         )
       ],
     );
@@ -228,7 +308,9 @@ class _VideoPageState extends State<VideoPage> {
                               _sendInfoAndGotTo();
                             }
                           : null,
-                    )
+                    ),
+                    SizedBox(height: 10),
+                    Text((_selectedVideo != null) ? _selectedVideo["name"] : "")
                   ],
                 ),
               );
@@ -354,7 +436,7 @@ class _VideoPageState extends State<VideoPage> {
       _videoPlayerController = VideoPlayerController.network(
           AppConfig.host + "/stream/" + _selectedVideo["file_name"]);
 
-      return Video_player(
+      return VideoPlayerWidget(
           videocontroller: _videoPlayerController, newKey: UniqueKey());
     }
   }
