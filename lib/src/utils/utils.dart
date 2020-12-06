@@ -244,7 +244,7 @@ final imagesName = [
   },
   {
     "name": "Pulgares opuestos complejos.",
-    "image": "m4v4",
+    "image": "m4v5",
   },
 ];
 
