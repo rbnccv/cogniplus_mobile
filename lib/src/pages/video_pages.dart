@@ -30,6 +30,7 @@ class _VideoPageState extends State<VideoPage> {
 
   bool _dialVisible = true;
   String url = "";
+  Future<void> _hasInitialize;
 
   Future<Map<String, dynamic>> _response;
 
@@ -456,38 +457,5 @@ class _VideoPageState extends State<VideoPage> {
         ))
       ],
     );
-  }
-
-  Future<void> _hasInitialize;
-
-  _setVideoPlayer() async {
-    _videoPlayerController = VideoPlayerController?.network(
-      AppConfig.host + "/stream/" + _selectedVideo["file_name"],
-    );
-    _hasInitialize = _videoPlayerController.initialize();
-
-    _hasInitialize.then((value) => VideoPlayerWidget(
-          videocontroller: _videoPlayerController,
-          newKey: UniqueKey(),
-          autoplay: true,
-          aInitialize: true,
-        ));
-  }
-
-  Widget _sett2VideoPlayer() {
-    if (_selectedVideo == null) {
-      return Image.asset("assets/images/default_video.png");
-    } else {
-      _videoPlayerController = VideoPlayerController?.network(
-        AppConfig.host + "/stream/" + _selectedVideo["file_name"],
-      );
-
-      return VideoPlayerWidget(
-        videocontroller: _videoPlayerController,
-        newKey: UniqueKey(),
-        autoplay: true,
-        aInitialize: true,
-      );
-    }
   }
 }
