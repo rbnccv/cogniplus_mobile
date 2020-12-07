@@ -10,6 +10,7 @@ class VideoPlayerWidget extends StatefulWidget {
   final bool allowFullScreen;
   final double aspectRatio;
   final bool autoplay;
+  final bool aInitialize;
 
   VideoPlayerWidget(
       {this.videocontroller,
@@ -17,7 +18,8 @@ class VideoPlayerWidget extends StatefulWidget {
       this.showControls = true,
       this.allowFullScreen = true,
       this.aspectRatio = 16 / 9,
-      this.autoplay = true})
+      this.autoplay = true,
+      this.aInitialize = false})
       : super(key: newKey);
 
   @override
@@ -36,7 +38,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void _initControllers(VideoPlayerController video) {
     this._chewieController = ChewieController(
         videoPlayerController: widget.videocontroller,
-        autoInitialize: true,
+        autoInitialize: widget.aInitialize,
         looping: false,
         showControls: widget.showControls,
         allowFullScreen: widget.allowFullScreen,
@@ -68,6 +70,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return Chewie(
+      key: widget.newKey,
       controller: this._chewieController,
     );
   }

@@ -264,6 +264,13 @@ class _VideoPageState extends State<VideoPage> {
                 _idSelectedModule = 1;
               }
 
+              if (_selectedVideo != null) {
+                _videoPlayerController = VideoPlayerController?.network(
+                  AppConfig.host + "/stream/" + _selectedVideo["file_name"],
+                );
+                _hasInitialize = _videoPlayerController.initialize();
+              }
+
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -278,7 +285,29 @@ class _VideoPageState extends State<VideoPage> {
                     SizedBox(
                       height: 200,
                       width: 400,
-                      child: _setVideoPlayer(),
+                      child: (_selectedVideo == null)
+                          ? Image.asset("assets/images/default_video.png")
+                          : FutureBuilder(
+                              future: _hasInitialize,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  return VideoPlayerWidget(
+                                    videocontroller: _videoPlayerController,
+                                    newKey: UniqueKey(),
+                                    autoplay: true,
+                                    aInitialize: true,
+                                  );
+                                }
+                                return Center(
+                                    child: SizedBox(
+                                        width: 30,
+                                        height: 30,
+                                        child: CircularProgressIndicator(
+                                            backgroundColor:
+                                                Colors.transparent)));
+                              },
+                            ),
                     ),
                     SizedBox(height: 10),
                     SizedBox(
@@ -429,15 +458,36 @@ class _VideoPageState extends State<VideoPage> {
     );
   }
 
-  Widget _setVideoPlayer() {
+  Future<void> _hasInitialize;
+
+  _setVideoPlayer() async {
+    _videoPlayerController = VideoPlayerController?.network(
+      AppConfig.host + "/stream/" + _selectedVideo["file_name"],
+    );
+    _hasInitialize = _videoPlayerController.initialize();
+
+    _hasInitialize.then((value) => VideoPlayerWidget(
+          videocontroller: _videoPlayerController,
+          newKey: UniqueKey(),
+          autoplay: true,
+          aInitialize: true,
+        ));
+  }
+
+  Widget _sett2VideoPlayer() {
     if (_selectedVideo == null) {
       return Image.asset("assets/images/default_video.png");
     } else {
-      _videoPlayerController = VideoPlayerController.network(
-          AppConfig.host + "/stream/" + _selectedVideo["file_name"]);
+      _videoPlayerController = VideoPlayerController?.network(
+        AppConfig.host + "/stream/" + _selectedVideo["file_name"],
+      );
 
       return VideoPlayerWidget(
-          videocontroller: _videoPlayerController, newKey: UniqueKey());
+        videocontroller: _videoPlayerController,
+        newKey: UniqueKey(),
+        autoplay: true,
+        aInitialize: true,
+      );
     }
   }
 }

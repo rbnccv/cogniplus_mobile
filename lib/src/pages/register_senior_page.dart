@@ -94,6 +94,7 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
     setState(() {
       if (_adulto != null) _setFormFields(_adulto);
     });
+
     return Scaffold(
       backgroundColor: Color(0xffE6E6E6),
       appBar: _appbar(context),
@@ -129,7 +130,12 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
   }
 
   Container _getForm(BuildContext context) {
-    double width = MediaQuery.of(context).size.width / 2 - 40;
+    final isPortrait = MediaQuery.of(context).orientation;
+
+    double width = (isPortrait == Orientation.landscape)
+        ? MediaQuery.of(context).size.width / 2 - 90
+        : MediaQuery.of(context).size.width / 2 - 40;
+
     final inputDecorator = InputDecoration(
         fillColor: Colors.white,
         filled: true,
@@ -361,7 +367,11 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
                     SizedBox(
                         width: (width / 2) + 60,
                         height: 50.0,
-                        child: _recordButton(context))
+                        child: _recordButton(context)),
+                    SizedBox(
+                        width: (width / 2) + 60,
+                        height: 50.0,
+                        child: _backButton(context))
                   ],
                 ),
               ],
@@ -377,6 +387,18 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
               fontSize: 18.0,
               fontWeight: FontWeight.bold)),
       onPressed: () => _registrarAnciano(context),
+    );
+  }
+
+  FlatButton _backButton(BuildContext context) {
+    return FlatButton(
+      color: Theme.of(context).primaryColor,
+      child: Text('VOLVER',
+          style: TextStyle(
+              color: Colors.white,
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold)),
+      onPressed: () => Navigator.of(context).pop(),
     );
   }
 
