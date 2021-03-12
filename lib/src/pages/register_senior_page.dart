@@ -343,7 +343,8 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
                                   keyboardType: TextInputType.multiline,
                                   minLines: 4,
                                   maxLines: 6,
-                                  maxLengthEnforced: true,
+                                  maxLengthEnforcement:
+                                      MaxLengthEnforcement.enforced,
                                   textInputAction: TextInputAction.newline,
                                   validator: (value) => null,
                                   style: TextStyle(fontSize: 14),
@@ -367,20 +368,22 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
                     SizedBox(
                         width: (width / 2) + 60,
                         height: 50.0,
-                        child: _recordButton(context)),
+                        child: _backButton(context)),
                     SizedBox(
                         width: (width / 2) + 60,
                         height: 50.0,
-                        child: _backButton(context))
+                        child: _recordButton(context)),
                   ],
                 ),
               ],
             )));
   }
 
-  FlatButton _recordButton(BuildContext context) {
-    return FlatButton(
-      color: Theme.of(context).primaryColor,
+  TextButton _recordButton(BuildContext context) {
+    return TextButton(
+      //color: Theme.of(context).primaryColor,
+      style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(utils.primary)),
       child: Text('REGISTRAR',
           style: TextStyle(
               color: Colors.white,
@@ -390,9 +393,11 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
     );
   }
 
-  FlatButton _backButton(BuildContext context) {
-    return FlatButton(
-      color: Theme.of(context).primaryColor,
+  TextButton _backButton(BuildContext context) {
+    return TextButton(
+      //color: Theme.of(context).primaryColor,
+      style:
+          ButtonStyle(backgroundColor: MaterialStateProperty.all(utils.accent)),
       child: Text('VOLVER',
           style: TextStyle(
               color: Colors.white,
@@ -490,7 +495,7 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
   }
 
   List<DropdownMenuItem<String>> getOpcionesDropdown() {
-    List<DropdownMenuItem<String>> lista = new List();
+    List<DropdownMenuItem<String>> lista = [];
 
     _gradoEscolaridad.forEach((opt) {
       lista.add(DropdownMenuItem(
@@ -502,11 +507,16 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
     return lista;
   }
 
-  FlatButton _makeDate(BuildContext context) {
-    return FlatButton(
+  TextButton _makeDate(BuildContext context) {
+    return TextButton(
+      style:
+          ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.white)),
       onPressed: () {
         DatePicker.showDatePicker(
           context,
+          theme: DatePickerTheme(
+            backgroundColor: Colors.white,
+          ),
           showTitleActions: true,
           minTime: DateTime(1900),
           maxTime: DateTime(2050),
@@ -518,10 +528,10 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
           locale: LocaleType.es,
         );
       },
-      color: Colors.white,
+      //color: Colors.white,
       child: Text(
         '$_fechaNacimiento',
-        style: TextStyle(fontSize: 14),
+        style: TextStyle(fontSize: 14, color: Colors.black),
       ),
     );
   }

@@ -201,7 +201,7 @@ class _VideoPageState extends State<VideoPage> {
   SpeedDial _floatingActionButton(BuildContext context) {
     return SpeedDial(
       // both default to 16
-      marginRight: 18,
+      marginEnd: 18,
       marginBottom: 20,
       animatedIcon: AnimatedIcons.menu_close,
       animatedIconTheme: IconThemeData(size: 22.0),
@@ -323,7 +323,7 @@ class _VideoPageState extends State<VideoPage> {
                       ),
                     ),
                     SizedBox(height: 30),
-                    RaisedButton(
+                    MaterialButton(
                       padding:
                           EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       child: Text("IR A CUESTIONARIO",
@@ -340,7 +340,7 @@ class _VideoPageState extends State<VideoPage> {
                           : null,
                     ),
                     SizedBox(height: 10),
-                    Text((_selectedVideo != null) ? _selectedVideo["name"] : "")
+                    Text((_selectedVideo != null) ? _selectedVideo["name"] : "Seleccione un video.")
                   ],
                 ),
               );

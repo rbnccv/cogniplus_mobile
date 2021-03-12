@@ -76,11 +76,12 @@ class _LoginUserPageState extends State<LoginUserPage> {
           alignment: Alignment(-0.9, -0.9),
           child: Column(children: <Widget>[
             Text('¿No tienes Cuenta?', style: utils.estBodyAccent14),
-            FlatButton(
-                color: utils.accent,
-                child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 7, horizontal: 2),
-                    child: Text('REGISTRATE', style: utils.estBodyWhite18)),
+            TextButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(utils.accent),
+                ),
+                //color: utils.accent,
+                child: Text('REGISTRATE', style: utils.estBodyWhite18),
                 onPressed: () {
                   Navigator.of(context)
                       .push(MaterialPageRoute(builder: (context) {
@@ -100,10 +101,7 @@ class _LoginUserPageState extends State<LoginUserPage> {
                 children: <Widget>[
                   Text(
                     'Politicas de privacidad',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400
-                    ),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
                     textAlign: TextAlign.center,
                   ),
                   IconButton(
@@ -133,13 +131,14 @@ class _LoginUserPageState extends State<LoginUserPage> {
               //color: Colors.red,
               child: Center(
                   child: Stack(children: <Widget>[
-                Positioned(
-                    top: 0,
-                    left: 0,
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      width: 240.0,
-                      height: 120.0,
+                Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 240.0,
+                        height: 120.0,
+                      ),
                     )),
                 Positioned(
                     top: 170,
@@ -184,8 +183,6 @@ class _LoginUserPageState extends State<LoginUserPage> {
               validator: (value) {
                 if (value.isEmpty) return "La contraseña está vacia.";
 
-                print(value.toString());
-
                 return null;
               }),
           SizedBox(height: 10, width: 0),
@@ -202,10 +199,13 @@ class _LoginUserPageState extends State<LoginUserPage> {
                 });
               }),
           SizedBox(height: 40, width: 0),
-          FlatButton(
-              color: utils.accent,
+          TextButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(utils.accent),
+              ),
+              //color: utils.accent,
               child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 2),
+                  padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
                   child: Text(
                     _isLoading ? 'Autenticando...' : 'INICIAR SESIÓN',
                     style: TextStyle(

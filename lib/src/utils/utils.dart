@@ -90,7 +90,7 @@ void showSnack(String title, String message, BuildContext context) {
     //dismissDirection: FlushbarDismissDirection.HORIZONTAL,
     //flushbarStyle: FlushbarStyle.GROUNDED,
     isDismissible: false,
-    mainButton: FlatButton(
+    mainButton: MaterialButton(
         child: Text("OK", style: TextStyle(color: Colors.amber)),
         onPressed: () {
           flush.dismiss(true); // result = true

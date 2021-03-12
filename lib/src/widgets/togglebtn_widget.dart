@@ -64,7 +64,7 @@ class _ToggleBtnState extends State<ToggleBtn> {
     return SizedBox(
       height: widget.diameter,
       width: widget.diameter,
-      child: RaisedButton(
+      child: MaterialButton(
           child: _icon,
           color: _background,
           padding: EdgeInsets.zero,

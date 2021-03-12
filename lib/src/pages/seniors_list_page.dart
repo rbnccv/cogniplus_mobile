@@ -49,17 +49,34 @@ class _SeniorListPageState extends State<SeniorListPage> {
                   });
                 },
                 child: _drawList(context))),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(
-            Icons.add,
-            size: 50.0,
-          ),
-          backgroundColor: Theme.of(context).primaryColor,
-          onPressed: () {
-            //Navigator.of(context).pushNamed('formadulto');
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => RegisterSeniorPage()));
-          },
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Chip(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(7))),
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 3),
+              shadowColor: Colors.black,
+              backgroundColor: Colors.grey[400],
+              label: Text(
+                "Adicionar Adulto Mayor",
+                style: TextStyle(
+                    color: Colors.white54,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+            SizedBox(width: 6),
+            FloatingActionButton(
+              child: Icon(Icons.add, size: 50.0),
+              backgroundColor: Theme.of(context).primaryColor,
+              onPressed: () {
+                //Navigator.of(context).pushNamed('formadulto');
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (BuildContext context) => RegisterSeniorPage()));
+              },
+            ),
+          ],
         ),
       ),
       onWillPop: () => showDialog<bool>(
@@ -68,11 +85,11 @@ class _SeniorListPageState extends State<SeniorListPage> {
                 title: Text("Advertencia"),
                 content: Text("¿Desea salir de la Aplicación?"),
                 actions: [
-                  FlatButton(
+                  MaterialButton(
                       onPressed: () => SystemChannels.platform
                           .invokeMethod("SystemNavigator.pop"),
                       child: Text("SI")),
-                  FlatButton(
+                  MaterialButton(
                       onPressed: () => Navigator.pop(context, false),
                       child: Text("NO"))
                 ],
@@ -112,12 +129,38 @@ class _SeniorListPageState extends State<SeniorListPage> {
   }
 
   FutureBuilder<List<AdultoModel>> _drawList(BuildContext context) {
+    final messageStyle = TextStyle(
+      fontSize: 18,
+      color: Colors.black,
+      fontWeight: FontWeight.normal,
+      shadows: [
+        Shadow(
+          blurRadius: 2,
+          color: Colors.grey[200],
+          offset: Offset(1, 1),
+        ),Shadow(
+          blurRadius: 5,
+          color: Colors.grey[700],
+          offset: Offset(2, 2),
+        )
+      ],
+    );
+
     return FutureBuilder<List<AdultoModel>>(
       future: _getList(context),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return Center(child: Text('Sin datos.'));
+        if (!snapshot.hasData) {
+          return Center(
+              child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(utils.primary)));
+        }
+
         final list = snapshot.data;
-        if (list.isEmpty) return Text('No existen datos');
+        if (list.isEmpty) {
+          return Center(
+              child: Text('No existe ningun adulto mayor inscrito.',
+                  style: messageStyle));
+        }
 
         return ListView.builder(
           itemCount: list.length,
@@ -134,8 +177,11 @@ class _SeniorListPageState extends State<SeniorListPage> {
                   height: 90.0,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: FlatButton(
-                        color: const Color(0xff259587),
+                    child: TextButton(
+                        //color: const Color(0xff259587),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(const Color(0xff259587))
+                        ),
                         child: Text(
                             //'adult_id: ${list[index].id} | user_id:${utils.user.id} - nombres:${list[index].nombres} ${list[index].apellidos}',
                             '${list[index].nombres} ${list[index].apellidos}',

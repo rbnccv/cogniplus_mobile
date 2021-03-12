@@ -177,7 +177,7 @@ class _QuestionPageState extends State<QuestionPage> {
       direction: (isLandscape) ? Axis.horizontal : Axis.vertical,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        FlatButton(
+        MaterialButton(
           color: Theme.of(context).primaryColor,
           child: SizedBox(
               width: (isLandscape) ? 150 : double.infinity,
@@ -200,7 +200,7 @@ class _QuestionPageState extends State<QuestionPage> {
             : SizedBox(
                 height: 10.0,
               ),
-        FlatButton(
+        MaterialButton(
             color: Theme.of(context).primaryColor,
             child: SizedBox(
                 width: (isLandscape) ? 150 : double.infinity,
@@ -274,7 +274,7 @@ class _QuestionPageState extends State<QuestionPage> {
       //dismissDirection: FlushbarDismissDirection.HORIZONTAL,
       //flushbarStyle: FlushbarStyle.GROUNDED,
       isDismissible: false,
-      mainButton: FlatButton(
+      mainButton: MaterialButton(
           child: Text("Aceptar", style: TextStyle(color: Colors.amber)),
           onPressed: () {
             flush.dismiss(true); // result = true

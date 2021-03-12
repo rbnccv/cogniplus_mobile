@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cogniplus_mobile/src/pages/login_user_page.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:cogniplus_mobile/src/widgets/input_text.dart';
 import 'package:flutter/material.dart';
@@ -8,13 +9,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:connectivity/connectivity.dart';
 
 class RegisterUserPage extends StatefulWidget {
-  static final _registerFormKey = GlobalKey<FormState>();
+  
 
   @override
   _RegisterUserPageState createState() => _RegisterUserPageState();
 }
 
 class _RegisterUserPageState extends State<RegisterUserPage> {
+  final _registerFormKey = GlobalKey<FormState>();
   String _name;
   String _email;
   String _password;
@@ -42,7 +44,7 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
       Align(
           alignment: Alignment(-0.9, -0.9),
           child: Column(children: <Widget>[
-            FlatButton(
+            MaterialButton(
                 color: utils.accent,
                 child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 7, horizontal: 2),
@@ -112,7 +114,7 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
 
   Widget _getWidgetLoginForm() {
     return Form(
-      key: RegisterUserPage._registerFormKey,
+      key: _registerFormKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
@@ -166,7 +168,7 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
                 return null;
               }),
           SizedBox(height: 20, width: 0),
-          FlatButton(
+          MaterialButton(
               color: utils.accent,
               child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 2),
@@ -191,12 +193,12 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
   }
 
   void _registerUser(BuildContext context) async {
-    if (!RegisterUserPage._registerFormKey.currentState.validate()) {
+    if (!_registerFormKey.currentState.validate()) {
       _isLoading = false;
       return null;
     }
 
-    RegisterUserPage._registerFormKey.currentState.save();
+    _registerFormKey.currentState.save();
 
     var data = {
       'name': _name,
@@ -226,22 +228,25 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
         await Api().setPostDataFromApi(url: '/auth/signup', data: data);
 
     var body = json.decode(response.body);
+    String msg = '';
 
     if (response.statusCode == 201 && body['user']['id'] != null) {
-      Navigator.of(context).pop();
+      msg = body["message"].toString();
+      utils.showSnack('Mensaje', msg, context);
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => LoginUserPage()));
     } else {
       setState(() {
         _isLoading = false;
       });
 
-      String msg = '';
-
-      if (body['message'] == null) return;
-      msg = body['message'].toString() + "\n";
+      // if (body['message'] != null) {
+      //   msg = body['message'].toString() + "\n";
+      // }
 
       if (body['errors'] == null) return;
       body['errors'].forEach((key, value) {
-        msg += " - $key: $value\n";
+        msg += "- " + value.toString() + "\n";
       });
 
       utils.showSnack('Mensaje', msg, context);

@@ -5,6 +5,7 @@ import 'package:cogniplus_mobile/src/pages/seniors_list_page.dart';
 import 'package:cogniplus_mobile/src/pages/video_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
 import 'package:flushbar/flushbar.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:flutter/material.dart';
@@ -150,7 +151,7 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
                   keyboardType: TextInputType.multiline,
                   minLines: 6,
                   maxLines: 10,
-                  maxLengthEnforced: true,
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
                   textInputAction: TextInputAction.newline,
                   style: TextStyle(fontSize: 14),
                   decoration: InputDecoration(
@@ -176,7 +177,7 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
       direction: (isLandscape) ? Axis.horizontal : Axis.vertical,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        FlatButton(
+        MaterialButton(
             color: Theme.of(context).primaryColor,
             child: SizedBox(
                 width: (isLandscape) ? 240 : double.infinity,
@@ -204,7 +205,7 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
             : SizedBox(
                 height: 10,
               ),
-        FlatButton(
+        MaterialButton(
             color: Theme.of(context).primaryColor,
             child: SizedBox(
                 width: (isLandscape) ? 240 : double.infinity,
@@ -275,7 +276,7 @@ class _EvaluacionPageState extends State<EvaluacionPage> {
       //dismissDirection: FlushbarDismissDirection.HORIZONTAL,
       //flushbarStyle: FlushbarStyle.GROUNDED,
       isDismissible: false,
-      mainButton: FlatButton(
+      mainButton: TextButton(
           child: Text("VER MÁS VIDEOS.", style: TextStyle(color: Colors.amber)),
           onPressed: () {
             flush.dismiss(true); // result = true
