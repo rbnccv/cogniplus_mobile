@@ -68,7 +68,9 @@ class _VideoPageState extends State<VideoPage> {
 
     return WillPopScope(
       onWillPop: () {
-        return Future.value(false);
+        //return Future.value(false);
+        return Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => SeniorListPage()));
       },
       child: Scaffold(
           drawer: _drawer(context),
@@ -340,7 +342,9 @@ class _VideoPageState extends State<VideoPage> {
                           : null,
                     ),
                     SizedBox(height: 10),
-                    Text((_selectedVideo != null) ? _selectedVideo["name"] : "Seleccione un video.")
+                    Text((_selectedVideo != null)
+                        ? _selectedVideo["name"]
+                        : "Seleccione un video.")
                   ],
                 ),
               );

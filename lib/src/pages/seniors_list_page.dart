@@ -12,6 +12,22 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:cogniplus_mobile/src/utils/utils.dart' as utils;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+extension on AnimationController {
+  void repeatEx({@required int times}) {
+    var count = 0;
+
+    addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        if (++count < times) {
+          reverse();
+        }
+      } else if (status == AnimationStatus.dismissed) {
+        forward();
+      }
+    });
+  }
+}
+
 class SeniorListPage extends StatefulWidget {
   final GlobalKey<RefreshIndicatorState> _refreshKey =
       GlobalKey<RefreshIndicatorState>();
@@ -19,15 +35,36 @@ class SeniorListPage extends StatefulWidget {
   _SeniorListPageState createState() => _SeniorListPageState();
 }
 
-class _SeniorListPageState extends State<SeniorListPage> {
+class _SeniorListPageState extends State<SeniorListPage>
+    with SingleTickerProviderStateMixin {
   ConnectivityResult _connectivity;
+  AnimationController _controller;
+  Animation<double> _animation;
+  Animation _opacity;
+  Size _size;
+  Orientation _isPortrait;
 
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    );
+
+    final _curve = CurvedAnimation(parent: _controller, curve: Curves.ease);
+    _animation = Tween(begin: 0.0, end: 1.0).animate(_curve);
+    _opacity = Tween(begin: 1.0, end: 0.0).animate(_controller);
+
     _setConnectivity();
     WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) => widget._refreshKey.currentState.show());
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   _setConnectivity() async {
@@ -36,6 +73,13 @@ class _SeniorListPageState extends State<SeniorListPage> {
 
   @override
   Widget build(BuildContext context) {
+    _isPortrait = MediaQuery.of(context).orientation;
+    _size = MediaQuery.of(context).size;
+
+    _controller
+      ..repeatEx(times: 2)
+      ..forward();
+
     return WillPopScope(
       child: Scaffold(
         appBar: _appBar(context),
@@ -48,23 +92,40 @@ class _SeniorListPageState extends State<SeniorListPage> {
                     _drawList(context);
                   });
                 },
-                child: _drawList(context))),
+                child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: (_isPortrait == Orientation.portrait)
+                            ? _size.width * 0.1
+                            : _size.width * 0.15,
+                        vertical: 10),
+                    child: _drawList(context)))),
         floatingActionButton: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Chip(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(7))),
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 3),
-              shadowColor: Colors.black,
-              backgroundColor: Colors.grey[400],
-              label: Text(
-                "Adicionar Adulto Mayor",
-                style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500),
-              ),
+            AnimatedBuilder(
+              animation: _animation,
+              builder: (context, child) {
+                return FadeTransition(
+                  opacity: _animation,
+                  child: Opacity(
+                    opacity: _opacity.value,
+                    child: Chip(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(7))),
+                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 3),
+                      shadowColor: Colors.black,
+                      backgroundColor: Colors.grey[400],
+                      label: Text(
+                        "Nuevo adulto mayor",
+                        style: TextStyle(
+                            color: Colors.white54,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
             SizedBox(width: 6),
             FloatingActionButton(
@@ -138,7 +199,8 @@ class _SeniorListPageState extends State<SeniorListPage> {
           blurRadius: 2,
           color: Colors.grey[200],
           offset: Offset(1, 1),
-        ),Shadow(
+        ),
+        Shadow(
           blurRadius: 5,
           color: Colors.grey[700],
           offset: Offset(2, 2),
@@ -165,73 +227,84 @@ class _SeniorListPageState extends State<SeniorListPage> {
         return ListView.builder(
           itemCount: list.length,
           itemBuilder: (BuildContext context, int index) {
-            return Slidable(
-              key: Key(list[index].id.toString()),
-              closeOnScroll: true,
-              actionPane: SlidableDrawerActionPane(),
-              actionExtentRatio: 0.25,
-              child: Align(
-                alignment: Alignment.center,
-                child: SizedBox(
-                  width: 400.0,
-                  height: 90.0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextButton(
+            return Container(
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    spreadRadius: 0,
+                    blurRadius: 6)
+              ]),
+              margin: EdgeInsets.only(top: 10),
+              child: Slidable(
+                key: Key(list[index].id.toString()),
+                actionPane: SlidableStrechActionPane(),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: _size.width,
+                    height: 90,
+                    child: MaterialButton(
+                        color: Color(0xff259587),
                         //color: const Color(0xff259587),
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(const Color(0xff259587))
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(
+                              Icons.arrow_back_ios,
+                              color: Color(0xff158577),
+                            ),
+                            Text(
+                                //'adult_id: ${list[index].id} | user_id:${utils.user.id} - nombres:${list[index].nombres} ${list[index].apellidos}',
+                                '${list[index].nombres} ${list[index].apellidos}',
+                                style: utils.estBodyWhite18),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: Color(0xff158577),
+                            ),
+                            
+                          ],
                         ),
-                        child: Text(
-                            //'adult_id: ${list[index].id} | user_id:${utils.user.id} - nombres:${list[index].nombres} ${list[index].apellidos}',
-                            '${list[index].nombres} ${list[index].apellidos}',
-                            style: utils.estBodyWhite18),
                         onPressed: () {
-                          //SystemSound.play(SystemSoundType.click);
-
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (BuildContext context) =>
                                   VideoPage(adulto: list[index])));
-
-                          // Navigator.of(context)
-                          //     .pushNamed('video', arguments: list[index].id);
                         }),
                   ),
                 ),
-              ),
-              actions: <Widget>[
-                IconSlideAction(
-                  caption: 'Editar',
-                  color: Colors.black45,
-                  icon: Icons.mode_edit,
-                  onTap: () async {
-                    //Navigator.of(context)
-                    //    .pushNamed('formadulto', arguments: list[index]);
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            RegisterSeniorPage(adulto: list[index])));
-                  },
-                ),
-              ],
-              secondaryActions: <Widget>[
-                IconSlideAction(
-                  caption: 'Borrar',
-                  color: Colors.red,
-                  icon: Icons.delete,
-                  onTap: () async {
-                    var id = list[index].id;
-                    if (_connectivity != ConnectivityResult.none) {
-                      var response = await Api()
-                          .delDataFromApi(url: '/seniors/' + id.toString());
-                      var body = await json.decode(response.body);
-                      utils.showToast(context, body["message"]);
-                      //utils.showToast(context, '$body["message"] borrado.');
-                    }
+                actions: <Widget>[
+                  IconSlideAction(
+                    caption: 'Editar',
+                    color: Colors.black45,
+                    icon: Icons.mode_edit,
+                    onTap: () async {
+                      //Navigator.of(context)
+                      //    .pushNamed('formadulto', arguments: list[index]);
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              RegisterSeniorPage(adulto: list[index])));
+                    },
+                  ),
+                ],
+                secondaryActions: <Widget>[
+                  IconSlideAction(
+                    caption: 'Borrar',
+                    color: Colors.red,
+                    icon: Icons.delete,
+                    onTap: () async {
+                      var id = list[index].id;
+                      if (_connectivity != ConnectivityResult.none) {
+                        var response = await Api()
+                            .delDataFromApi(url: '/seniors/' + id.toString());
+                        var body = await json.decode(response.body);
+                        utils.showToast(context, body["message"]);
+                        //utils.showToast(context, '$body["message"] borrado.');
+                      }
 
-                    setState(() {});
-                  },
-                ),
-              ],
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
             );
           },
         );
@@ -249,7 +322,7 @@ class _SeniorListPageState extends State<SeniorListPage> {
     var response =
         await Api().getDataFromApi(url: '/user/' + id.toString() + '/seniors');
 
-    print(json.decode(response.body));
+    //print(json.decode(response.body));
 
     var body = (json.decode(response.body) as List).map((json) {
       return AdultoModel(

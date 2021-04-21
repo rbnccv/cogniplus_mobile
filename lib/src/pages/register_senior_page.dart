@@ -90,16 +90,22 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
   }
 
   @override
-  Scaffold build(BuildContext context) {
+  Widget build(BuildContext context) {
     setState(() {
       if (_adulto != null) _setFormFields(_adulto);
     });
 
-    return Scaffold(
-      backgroundColor: Color(0xffE6E6E6),
-      appBar: _appbar(context),
-      body: SafeArea(
-        child: SingleChildScrollView(child: _getForm(context)),
+    return WillPopScope(
+      onWillPop: () {
+        return Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => SeniorListPage()));
+      },
+      child: Scaffold(
+        backgroundColor: Color(0xffE6E6E6),
+        appBar: _appbar(context),
+        body: SafeArea(
+          child: SingleChildScrollView(child: _getForm(context)),
+        ),
       ),
     );
   }
@@ -115,9 +121,15 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
               onPressed: () {
                 utils.showIntroVideo(context);
               }),
-          Text(
-            'Añadir perfil',
-            style: utils.estTitulo,
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => SeniorListPage()));
+            },
+            child: Text(
+              'Añadir perfil',
+              style: utils.estTitulo,
+            ),
           ),
           IconButton(
               icon: Icon(FontAwesomeIcons.powerOff, color: Colors.white),
@@ -335,7 +347,10 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
                                 fontWeight: FontWeight.bold, fontSize: 14),
                           ),
                           Container(
-                              width: width * 2,
+                              width: (width * 2) +
+                                  (isPortrait == Orientation.landscape
+                                      ? 64
+                                      : 14),
                               child: TextFormField(
                                   controller: _infoTextController,
                                   onSaved: (value) =>
@@ -403,7 +418,8 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
               color: Colors.white,
               fontSize: 18.0,
               fontWeight: FontWeight.bold)),
-      onPressed: () => Navigator.of(context).pop(),
+      onPressed: () => Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => SeniorListPage())),
     );
   }
 
@@ -485,7 +501,6 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
                                     color: Colors.transparent, width: 0.0)))),
                     isExpanded: true,
                     value: _escolaridad,
-                    style: TextStyle(fontSize: 14, color: Colors.black),
                     items: getOpcionesDropdown(),
                     onChanged: (opt) {
                       setState(() => _escolaridad = opt);
@@ -497,10 +512,14 @@ class _RegisterSeniorPageState extends State<RegisterSeniorPage> {
   List<DropdownMenuItem<String>> getOpcionesDropdown() {
     List<DropdownMenuItem<String>> lista = [];
 
-    _gradoEscolaridad.forEach((opt) {
+    _gradoEscolaridad.forEach((value) {
       lista.add(DropdownMenuItem(
-        child: Text('  $opt'),
-        value: opt,
+        child: Text(
+          '  $value',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 14, color: Colors.black),
+        ),
+        value: value,
       ));
     });
 
