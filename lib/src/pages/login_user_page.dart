@@ -76,11 +76,9 @@ class _LoginUserPageState extends State<LoginUserPage> {
           alignment: Alignment(-0.9, -0.9),
           child: Column(children: <Widget>[
             Text('¿No tienes Cuenta?', style: utils.estBodyAccent14),
-            TextButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(utils.accent),
-                ),
-                //color: utils.accent,
+            MaterialButton(
+              elevation: 3,
+                color: utils.accent,
                 child: Text('REGISTRATE', style: utils.estBodyWhite18),
                 onPressed: () {
                   Navigator.of(context)
@@ -133,13 +131,13 @@ class _LoginUserPageState extends State<LoginUserPage> {
                   child: Stack(children: <Widget>[
                 Positioned.fill(
                     child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        width: 240.0,
-                        height: 120.0,
-                      ),
-                    )),
+                  alignment: Alignment.topCenter,
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    width: 240.0,
+                    height: 120.0,
+                  ),
+                )),
                 Positioned(
                     top: 170,
                     left: 5,
@@ -199,37 +197,50 @@ class _LoginUserPageState extends State<LoginUserPage> {
                 });
               }),
           SizedBox(height: 40, width: 0),
-          TextButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(utils.accent),
-              ),
-              //color: utils.accent,
-              child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-                  child: Text(
-                    _isLoading ? 'Autenticando...' : 'INICIAR SESIÓN',
-                    style: TextStyle(
-                        fontSize: 20.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'Quicksand'),
-                  )),
-              onPressed: () {
-                setState(() {
-                  _isLoading = true;
-                });
-                _loginUser(context);
-              }),
+          _loginButton(context),
           //Text('Olvide mi contraseña', style: utils.estBodyAccent14),
         ],
       ),
     );
   }
 
+  String _buttonText = 'INICIAR SESIÓN';
+  Widget _loginButton(BuildContext context) {
+    return MaterialButton(
+        elevation: 3,
+        color: utils.accent,
+        disabledColor: Color(0xff808C95),
+        disabledTextColor: Colors.grey[400],
+        disabledElevation: 0,
+        height: 50,
+        child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+            child: Text(
+              '$_buttonText',
+              style: TextStyle(
+                  fontSize: 20.0,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'Quicksand'),
+            )),
+        onPressed: _isLoading
+            ? null
+            : () {
+                setState(() {
+                  _isLoading = true;
+                  _buttonText = 'Autenticando...';
+                  _loginUser(context);
+                });
+              });
+  }
+
   void _loginUser(BuildContext context) async {
     if (!widget._formKey.currentState.validate()) {
-      _isLoading = false;
-      return null;
+      setState(() {
+        _buttonText = 'INICIAR SESIÓN';
+        _isLoading = false;
+        return null;
+      });
     }
 
     widget._formKey.currentState.save();
@@ -242,14 +253,20 @@ class _LoginUserPageState extends State<LoginUserPage> {
 
     var connectivity = await Connectivity().checkConnectivity();
 
-    if (connectivity != ConnectivityResult.none) {
-      _loginFromNetwork(data, context);
+    switch (connectivity) {
+      case ConnectivityResult.none:
+        utils.showToast(context, 'sin conexión.');
+        break;
+      case ConnectivityResult.mobile:
+      case ConnectivityResult.wifi:
+        _loginFromNetwork(data, context);
+        break;
+      default:
+        print('Error: $connectivity');
     }
   }
 
   _loginFromNetwork(data, context) async {
-    utils.showToast(context, 'Online');
-
     try {
       var response = await Api().authData(data, '/auth/login');
       var body = json.decode(response.body);
@@ -272,6 +289,8 @@ class _LoginUserPageState extends State<LoginUserPage> {
       } else {
         setState(() {
           _isLoading = false;
+          _buttonText = 'INICIAR SESIÓN';
+          utils.showSnack("Error", 'Error en el token', context);
         });
 
         utils.showSnack('Mensaje', body['message'], context);
@@ -279,6 +298,7 @@ class _LoginUserPageState extends State<LoginUserPage> {
     } catch (e) {
       setState(() {
         _isLoading = false;
+        _buttonText = 'INICIAR SESIÓN';
         utils.showSnack("Error", e.toString(), context);
       });
     }

@@ -114,11 +114,11 @@ class _SeniorListPageState extends State<SeniorListPage>
                           borderRadius: BorderRadius.all(Radius.circular(7))),
                       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 3),
                       shadowColor: Colors.black,
-                      backgroundColor: Colors.grey[400],
+                      backgroundColor: Colors.grey[600],
                       label: Text(
                         "Nuevo adulto mayor",
                         style: TextStyle(
-                            color: Colors.white54,
+                            color: Colors.white,
                             fontSize: 15,
                             fontWeight: FontWeight.w500),
                       ),
@@ -274,6 +274,7 @@ class _SeniorListPageState extends State<SeniorListPage>
                 actions: <Widget>[
                   IconSlideAction(
                     caption: 'Editar',
+                    foregroundColor: Color(0xffE6E6E6),
                     color: Colors.black45,
                     icon: Icons.mode_edit,
                     onTap: () async {
@@ -289,6 +290,7 @@ class _SeniorListPageState extends State<SeniorListPage>
                   IconSlideAction(
                     caption: 'Borrar',
                     color: Colors.red,
+                    foregroundColor: Color(0xffE6E6E6),
                     icon: Icons.delete,
                     onTap: () async {
                       var id = list[index].id;
