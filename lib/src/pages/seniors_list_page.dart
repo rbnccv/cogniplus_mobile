@@ -4,6 +4,7 @@ import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/pages/register_senior_page.dart';
 import 'package:cogniplus_mobile/src/pages/video_pages.dart';
 import 'package:cogniplus_mobile/src/providers/api.dart';
+import 'package:cogniplus_mobile/src/providers/userSharedPreferences.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,12 +38,12 @@ class SeniorListPage extends StatefulWidget {
 
 class _SeniorListPageState extends State<SeniorListPage>
     with SingleTickerProviderStateMixin {
-  ConnectivityResult _connectivity;
+  ConnectivityResult  _connectivity;
   AnimationController _controller;
-  Animation<double> _animation;
-  Animation _opacity;
-  Size _size;
-  Orientation _isPortrait;
+  Animation<double>   _animation;
+  Animation           _opacity;
+  Size                _size;
+  Orientation         _isPortrait;
 
   @override
   void initState() {
@@ -159,6 +160,7 @@ class _SeniorListPageState extends State<SeniorListPage>
   }
 
   Widget _appBar(BuildContext context) {
+    final _preferences = UserSharedPreferences();
     return AppBar(
       automaticallyImplyLeading: false,
       title: Row(
@@ -173,7 +175,8 @@ class _SeniorListPageState extends State<SeniorListPage>
                 utils.showIntroVideo(context);
               }),
           Text(
-            'Seleccione perfil',
+            'Selecciona un perfil:\n- ${_preferences.userName} -',
+            textAlign: TextAlign.center,
             style: utils.estTitulo,
           ),
           IconButton(
@@ -261,7 +264,6 @@ class _SeniorListPageState extends State<SeniorListPage>
                               Icons.arrow_forward_ios,
                               color: Color(0xff158577),
                             ),
-                            
                           ],
                         ),
                         onPressed: () {

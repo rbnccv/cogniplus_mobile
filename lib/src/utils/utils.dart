@@ -17,8 +17,8 @@ final fontColor = const Color(0xff303E48);
 final scaffoldBackground = const Color(0xffE6E6E6);
 
 final estTitulo = TextStyle(
-  fontSize: 22.0,
-  fontWeight: FontWeight.bold,
+  fontSize: 20.0,
+  fontWeight: FontWeight.w500,
   fontFamily: 'Montserrat',
   color: accent,
 );

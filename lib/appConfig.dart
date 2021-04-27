@@ -1,5 +1,5 @@
 class AppConfig {
-   static const host = "https://cogniplus.cf";
+   static const host = "https://cogniplus.org";
    static const apihost = "$host/api";
 
   //static const host = "http://192.168.0.10:3000";

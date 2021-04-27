@@ -5,19 +5,22 @@ class UserModel {
   String name;
   String email;
   String password;
+  String role;
 
-  UserModel({this.id, this.name, this.email, this.password});
+  UserModel({this.id, this.name, this.email, this.password, this.role});
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
       id: json['id'],
       name: json['name'],
       email: json['email'],
+      role: json['role'],
       password: json['password']);
 
   Map<String, dynamic> toJson() => {
         "id": this.id,
         "name": this.name,
         "email": this.email,
+        "role": this.role,
         "password": this.password
       };
 

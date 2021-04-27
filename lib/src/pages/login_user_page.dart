@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cogniplus_mobile/src/model/adulto_model.dart';
 import 'package:cogniplus_mobile/src/model/user_model.dart';
 import 'package:cogniplus_mobile/src/pages/register_user_page.dart';
 import 'package:cogniplus_mobile/src/pages/seniors_list_page.dart';
@@ -29,10 +30,11 @@ class _LoginUserPageState extends State<LoginUserPage> {
   String _email;
   String _password;
   bool _rememberMe = true;
-  bool _isLoading = false;
   FlutterSecureStorage _storage = FlutterSecureStorage();
   String _userEmail;
   String _userPass;
+  String _buttonText;
+  bool _isLoading;
 
   final _preferences = new UserSharedPreferences();
 
@@ -52,6 +54,8 @@ class _LoginUserPageState extends State<LoginUserPage> {
   setInit() async {
     _userEmail = _preferences.userEmail;
     _userPass = _preferences.userPass;
+    _buttonText = 'INICIAR SESIÓN';
+    _isLoading = false;
   }
 
   @override
@@ -77,7 +81,7 @@ class _LoginUserPageState extends State<LoginUserPage> {
           child: Column(children: <Widget>[
             Text('¿No tienes Cuenta?', style: utils.estBodyAccent14),
             MaterialButton(
-              elevation: 3,
+                elevation: 3,
                 color: utils.accent,
                 child: Text('REGISTRATE', style: utils.estBodyWhite18),
                 onPressed: () {
@@ -184,18 +188,21 @@ class _LoginUserPageState extends State<LoginUserPage> {
                 return null;
               }),
           SizedBox(height: 10, width: 0),
+
           CheckboxListTile(
               title: Text('Recuerdame.',
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.w500)),
               activeColor: Colors.white,
               checkColor: Colors.green,
+              controlAffinity: ListTileControlAffinity.leading,
               value: _rememberMe,
               onChanged: (bool value) {
                 setState(() {
                   _rememberMe = value;
                 });
               }),
+
           SizedBox(height: 40, width: 0),
           _loginButton(context),
           //Text('Olvide mi contraseña', style: utils.estBodyAccent14),
@@ -204,7 +211,6 @@ class _LoginUserPageState extends State<LoginUserPage> {
     );
   }
 
-  String _buttonText = 'INICIAR SESIÓN';
   Widget _loginButton(BuildContext context) {
     return MaterialButton(
         elevation: 3,
@@ -282,14 +288,38 @@ class _LoginUserPageState extends State<LoginUserPage> {
 
         _preferences.userEmail = data["email"];
         _preferences.userPass = data["password"];
+        _preferences.userName = body["name"];
+        _preferences.userRoleTitle = body["role_title"];
 
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return SeniorListPage();
-        }));
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => SeniorListPage()));
+
+        // switch (body['role_id']) {
+        //   case 1:
+        //   case 3:
+        //     // Navigator.of(context)
+        //     //     .push(MaterialPageRoute(builder: (_) => SeniorListPage()));
+        //     print('lista de adultos');
+        //     break;
+        //   case 2:
+        //     // Navigator.of(context)
+        //     //     .push(MaterialPageRoute(builder: (_) => LoginUserPage()));
+        //     print('video page');
+        //     break;
+        // }
+
+        // print('ROLE_ID: ${body['role_id']}');
+
+        // setState(() {
+        //   _isLoading = false;
+        //   _buttonText = 'INICIAR SESIÓN';
+        // });
+
       } else {
         setState(() {
           _isLoading = false;
           _buttonText = 'INICIAR SESIÓN';
+
           utils.showSnack("Error", 'Error en el token', context);
         });
 
@@ -299,8 +329,37 @@ class _LoginUserPageState extends State<LoginUserPage> {
       setState(() {
         _isLoading = false;
         _buttonText = 'INICIAR SESIÓN';
+
         utils.showSnack("Error", e.toString(), context);
       });
     }
+  }
+
+  Future<AdultoModel> _getAdultoModel() async {
+    String value = _preferences.userEmail;
+    var response = await Api().getDataFromApi(
+        url: '/seniors/' + value
+          ..trim()
+          ..toLowerCase());
+
+    var body = json.decode(response.body);
+    print(body.toString());
+
+    if (body['message'].toString().toLowerCase().contains('model not found')) {
+      print('Create new Senior ');
+      return AdultoModel();
+    } else
+      return AdultoModel(
+          id: body['id'],
+          nombres: body['names'],
+          apellidos: body['last_names'],
+          sexo: body['gender'].toString(),
+          escolaridad: body['course'],
+          fechaNacimiento: body['birthday'],
+          fono: body['phone'],
+          correo: body['email'],
+          ingresos: body['revenue'].toString(),
+          infoAdicional: body['info'],
+          rut: body['rut']);
   }
 }

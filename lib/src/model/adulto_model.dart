@@ -10,6 +10,7 @@ class AdultoModel {
   String fechaNacimiento;
   String ingresos;
   String fono;
+  String correo;
   String infoAdicional;
 
   AdultoModel(
@@ -22,6 +23,7 @@ class AdultoModel {
       this.fechaNacimiento,
       this.ingresos,
       this.fono,
+      this.correo,
       this.infoAdicional});
 
   static AdultoModel toAdultoModelFromNetwork({String string}) {
@@ -37,6 +39,7 @@ class AdultoModel {
       fechaNacimiento: jsonData["birthday"],
       ingresos: jsonData["revenue"].toString(),
       fono: jsonData["phone"],
+      correo: jsonData["email"],
       infoAdicional: jsonData["info"],
     );
   }
@@ -51,6 +54,7 @@ class AdultoModel {
       fechaNacimiento: json['fechaNacimiento'],
       ingresos: json['ingresos'],
       fono: json['fono'],
+      correo: json["email"],
       infoAdicional: json['infoAdicional']);
 
   Map<String, dynamic> toJson() => {
@@ -63,6 +67,7 @@ class AdultoModel {
         "fechaNacimiento": this.fechaNacimiento,
         "ingresos": this.ingresos,
         "fono": this.fono,
+        "correo": this.correo,
         "infoAdicional": this.infoAdicional
       };
 }

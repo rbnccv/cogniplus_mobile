@@ -31,4 +31,20 @@ class UserSharedPreferences {
   set userPass(String value) {
     _preferences.setString("user_pass", value);
   }
+
+  get userRoleTitle {
+    return _preferences.getString("user_role_title");
+  }
+
+  set userRoleTitle(String value) {
+    _preferences.setString("user_role_title", value);
+  }
+
+  get userName {
+    return _preferences.getString("user_name");
+  }
+
+  set userName(String value) {
+    _preferences.setString("user_name", value);
+  }
 }
